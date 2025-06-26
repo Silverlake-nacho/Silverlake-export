@@ -23,7 +23,7 @@ def get_matching_google_sheet_rows(engine_code):
         SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
         creds = service_account.Credentials.from_service_account_file('credentials.json', scopes=SCOPES)
 
-        SPREADSHEET_ID = '1iH-70OrINA2jcd6YKszW-N8XpuJDTC9A3oArNWHbEeY'
+        SPREADSHEET_ID = '11I8XweK0R8OsxvDN783zBdQLLZpG50U_gaifYDMNFZS4'
         RANGE = 'Sheet1'
 
         service = build('sheets', 'v4', credentials=creds)
@@ -70,6 +70,8 @@ app.secret_key = 'your_super_secret_key_here'
 
 USERS = {
     'admin': 'Silverlake1!',
+    'asm': 'ASMSilverlake1!',
+    'marcio': 'Silverlake1!',
     'nacho': 'Silverlake1!'
 }
 
@@ -177,82 +179,7 @@ def download():
         return send_file(output, download_name="parts_opportunity.xlsx", as_attachment=True)
     return "No data to download", 400
 
-@app.route('/ebay_small_parts')
-def ebay_small_parts():
-    import time
-    model = request.args.get('model', '').strip()
-    year = request.args.get('year', '').strip()
-    if not model or not year:
-        return "Model and year are required.", 400
 
-    query = f"{model} {year} used car parts"
-    search_url = (
-        "https://www.ebay.co.uk/sch/i.html?_nkw=" + query.replace(" ", "+") +
-        "&_sop=12&_udhi=50&LH_ItemCondition=3000&LH_Complete=1&LH_Sold=1"
-    )
-    print("\U0001F50D eBay search URL:", search_url)
-
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                      "(KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Connection": "keep-alive",
-    }
-
-    response = None
-    for attempt in range(3):
-        try:
-            response = requests.get(search_url, headers=headers, timeout=10)
-            response.raise_for_status()
-            break
-        except Exception as e:
-            print(f"eBay fetch attempt {attempt + 1} failed: {e}")
-            time.sleep(2)
-    else:
-        return render_template_string("<p><strong>Failed to fetch data from eBay after 3 attempts.</strong></p>")
-
-    soup = BeautifulSoup(response.text, 'html.parser')
-    items = soup.select('.s-item')
-
-    part_list = []
-
-    for item in items:
-        title_tag = item.select_one('.s-item__title')
-        price_tag = item.select_one('.s-item__price')
-        link_tag = item.select_one('.s-item__link')
-
-        if not title_tag or not price_tag or not link_tag:
-            continue
-
-        title = title_tag.get_text(strip=True)
-        price_text = price_tag.get_text(strip=True).replace("£", "").split()[0]
-        link = link_tag.get("href")
-
-        try:
-            price = float(price_text)
-        except ValueError:
-            continue
-
-        if price <= 50:
-            part_list.append({
-                "title": title,
-                "price": price,
-                "link": link
-            })
-
-    if not part_list:
-        return "<p>No results found under £50.</p>"
-
-    part_list.sort(key=lambda x: x["price"], reverse=True)
-
-    html = "<table class='table table-striped'><thead><tr><th>Title</th><th>Price</th><th>Link</th></tr></thead><tbody>"
-    for part in part_list:
-        html += f"<tr><td>{part['title']}</td><td>£{part['price']:.2f}</td><td><a href='{part['link']}' target='_blank'>View</a></td></tr>"
-    html += "</tbody></table>"
-
-    return render_template_string(html)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
