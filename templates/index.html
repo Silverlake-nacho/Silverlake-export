@@ -94,22 +94,7 @@
             <input type="text" name="engine_code" class="form-control">
           </div>
         </div>
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label class="form-label">Minimum Price (£)</label>
-            <input type="number" name="min_price" class="form-control" step="0.01">
-          </div>
-          <div class="col-md-6 mb-3">
-            <label class="form-label">Minimum Opportunity Score (£)</label>
-            <input type="number" name="min_opportunity" class="form-control" step="0.01">
-          </div>
-        </div>
         <button type="submit" class="btn btn-primary">Search</button>
-        {% if parts %}
-          <a href="/download" class="btn btn-success ms-2">Download Excel</a>
-        {% endif %}
-      
-<button type="button" class="btn btn-warning ms-2" id="ebayButton">eBay Small Parts</button>
 
 </form>
 
@@ -117,32 +102,6 @@
       <h2 class="mt-5">Top Parts for {{ search_details.model }} (Year {{ search_details.year }}) {% if search_details.engine_code %} Engine: {{ search_details.engine_code }} {% endif %}</h2>
       {% endif %}
 
-      {% if parts %}
-      <table id="parts-table" class="table table-striped mt-3">
-        <thead><tr>
-          <th>Part</th><th>Start Year</th><th>End Year</th><th>Description</th><th>Price</th><th>Parts in Stock</th><th>Backorders</th><th>Parts Sold</th><th>Not Found 180 days</th><th>Potential Profit</th><th>Sales Speed</th><th>Opportunity Score</th>
-        </tr></thead>
-        <tbody>
-        {% for row in parts %}
-          <tr>
-            <td {% if row['Backorders'] > 0 %} style="color: #5c9c13;" {% endif %}>{{ row['Part'] }}</td>
-            <td {% if row['Backorders'] > 0 %} style="color: #5c9c13;" {% endif %}>{{ row['IC Start Year'] }}</td>
-            <td {% if row['Backorders'] > 0 %} style="color: #5c9c13;" {% endif %}>{{ row['IC End Year'] }}</td>
-            <td {% if row['Backorders'] > 0 %} style="color: #5c9c13;" {% endif %}>{{ row['IC Description'] }}</td>
-            <td {% if row['Backorders'] > 0 %} style="color: #5c9c13;" {% endif %}>£{{ "{:.2f}".format(row['B Price']) }}</td>
-            <td {% if row['Backorders'] > 0 %} style="color: #5c9c13;" {% endif %}>{{ row['Parts in Stock'] }}</td>
-            <td {% if row['Backorders'] > 0 %} style="color: #5c9c13;" {% endif %}>{{ row['Backorders'] }}</td>
-            <td {% if row['Backorders'] > 0 %} style="color: #5c9c13;" {% endif %}>{{ row['Parts Sold All'] }}</td>
-            <td {% if row['Backorders'] > 0 %} style="color: #5c9c13;" {% endif %}>{{ row['Not Found 180 days'] }}</td>
-            <td {% if row['Backorders'] > 0 %} style="color: #5c9c13;" {% endif %}>£{{ "{:.2f}".format(row['Potential_Profit']) }}</td>
-            <td {% if row['Backorders'] > 0 %} style="color: #5c9c13;" {% endif %}>{{ "{:.2f}".format(row['Sales_Speed']) }}</td>
-            <td {% if row['Backorders'] > 0 %} style="color: #5c9c13;" {% endif %}>£{{ "{:.2f}".format(row['Opportunity_Score']) }}</td>
-          </tr>
-        {% endfor %}
-        </tbody>
-	      
-      </table>
-      {% endif %}
       {% if google_sheet_matches %}
 <h2 class="mt-5">Google Sheet Matches for Engine Code</h2>
 <table class="table table-striped mt-3">
@@ -229,51 +188,9 @@
       });
     </script>
 
-  
-<!-- Modal -->
-<div class="modal fade" id="ebayModal" tabindex="-1" aria-labelledby="ebayModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="ebayModalLabel">eBay Small Parts Lookup</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="ebayModalBody">
-        <p>Loading...</p>
-      </div>
-    </div>
-  </div>
-</div>
-
 </body>
 
-<script>
-  $(document).ready(function() {
-    $('#ebayButton').on('click', function() {
-      const model = $('input[name="model"]').val().trim();
-      const year = $('input[name="year"]').val().trim();
-      if (!model || !year) {
-        alert("Please enter both model and year first.");
-        return;
-      }
 
-      $('#ebayModalBody').html('<p>Loading...</p>');
-      $('#ebayModal').modal('show');
-
-      $.ajax({
-        url: '/ebay_small_parts',
-        method: 'GET',
-        data: { model: model, year: year },
-        success: function(data) {
-          $('#ebayModalBody').html(data);
-        },
-        error: function() {
-          $('#ebayModalBody').html('<p>Error loading data.</p>');
-        }
-      });
-    });
-  });
-</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </html>
