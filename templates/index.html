@@ -76,34 +76,48 @@
         </div>
       </nav>
 
-      <h1 class="mb-4 text-center">Silverlake Part Sales Opportunity Finder</h1>
+      <h1 class="mb-4 text-center">Silverlake Export Portal</h1>
 
-      <form method="post">
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label class="form-label">Model</label>
-            <input type="text" name="model" class="form-control" required>
-            <ul id="model-suggestions" class="list-group" style="display: none; position: absolute; z-index: 1000; max-height: 150px; overflow-y: auto;"></ul>
-          </div>
-          <div class="col-md-2 mb-3">
-            <label class="form-label">Year</label>
-            <input type="number" name="year" class="form-control" required>
-          </div>
-          <div class="col-md-4 mb-3">
-            <label class="form-label">Engine Code (Optional)</label>
-            <input type="text" name="engine_code" class="form-control">
-          </div>
+<form method="post">
+  <div class="row">
+    <div class="col-md-6">
+      <!-- Vehicle Registration Input -->
+      <div class="mb-3">
+        <label for="registration" class="form-label">Vehicle Registration (UK)</label>
+        <div class="input-group">
+          <input type="text" class="form-control" id="registration" name="registration" placeholder="e.g. AB12CDE">
+          <button class="btn btn-secondary" type="button" onclick="fetchVehicleData()">Auto-fill</button>
         </div>
-        <button type="submit" class="btn btn-primary">Search</button>
-        <!-- Right-Side DVLA Info Table -->
-        <div class="col-md-6">
-          <h5 class="mb-3">DVLA Vehicle Info</h5>
-          <table class="table table-bordered table-sm" id="dvlaInfoTable" style="display: none;">
-            <tbody id="dvlaInfoBody"></tbody>
-          </table>
-        </div>
-      </div>	
+      </div>
 
+      <div class="mb-3">
+        <label class="form-label">Model</label>
+        <input type="text" name="model" class="form-control" required>
+        <ul id="model-suggestions" class="list-group" style="display: none; position: absolute; z-index: 1000; max-height: 150px; overflow-y: auto;"></ul>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Year</label>
+        <input type="number" name="year" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Engine Code (Optional)</label>
+        <input type="text" name="engine_code" class="form-control" id="engine_code_field">
+      </div>
+	    
+      <button type="submit" class="btn btn-primary">Search</button>
+      
+    </div>
+
+    <!-- Right-Side DVLA Info Table -->
+    <div class="col-md-6">
+      <h5 class="mb-3">DVLA Vehicle Info</h5>
+      <table class="table table-bordered table-sm" id="dvlaInfoTable" style="display: none;">
+        <tbody id="dvlaInfoBody"></tbody>
+      </table>
+    </div>
+  </div>
 </form>
 
       {% if search_details %}
