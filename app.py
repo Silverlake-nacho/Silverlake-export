@@ -188,8 +188,8 @@ def lookup_registration():
 
     try:
         # Provide your own credentials here
-        username = 'silverlake2'
-        password = 'Myth0l0gicalBeast'
+        username = 'silverlake_web'
+        password = 'SilverlakeSO322HL'
         credentials = f"{username}:{password}"
         auth_header = base64.b64encode(credentials.encode()).decode()
 
