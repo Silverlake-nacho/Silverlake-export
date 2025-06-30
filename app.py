@@ -207,10 +207,15 @@ def lookup_registration():
         vehicle_info = {item['key']: item['value'] for item in data}
 
         return {
-            'manufacturer': vehicle_info.get('MAKE', ''),
-            'model': vehicle_info.get('MODEL', ''),
-            'year': int(vehicle_info.get('MODEL_YEAR', 0) or vehicle_info.get('FIRST_REGISTERED', '0')[:4]),
-            'engine_code': vehicle_info.get('GetVehicles.DataArea.Vehicles.Vehicle.EngineModelCode', '')
+            'Manufacturer': vehicle_info.get('MAKE', ''),
+            'Model': vehicle_info.get('MODEL', ''),
+            'Trim Level': vehicle_info.get('TRIM_LEVEL', ''),
+            'Year': int(vehicle_info.get('MODEL_YEAR', 0) or vehicle_info.get('FIRST_REGISTERED', '0')[:4]),
+            'Engine code': vehicle_info.get('GetVehicles.DataArea.Vehicles.Vehicle.EngineModelCode', ''),
+            'Engine Size': int(vehicle_info.get('ENGINE_SIZE', 0)
+            'Doors': int(vehicle_info.get('DOORS', 0),
+            'Body Style': vehicle_info.get('BODY_STYLE', ''),
+            'Fuel Type': vehicle_info.get('FUEL_TYPE', '')
         }
 
     except Exception as e:
