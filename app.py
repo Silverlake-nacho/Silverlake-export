@@ -179,7 +179,34 @@ def download():
         return send_file(output, download_name="parts_opportunity.xlsx", as_attachment=True)
     return "No data to download", 400
 
+@app.route('/lookup_registration')
+def lookup_registration():
+    reg = request.args.get('reg', '').strip().upper()
+    if not reg:
+        return {'error': 'No registration provided'}, 400
 
+    try:
+        api_key = '9GlyMJQUdd318S6wsPFEh8Zd0oSm3GaD6gkddqm0'
+        url = 'https://driver-vehicle-licensing.api.gov.uk/vehicle-enquiry/v1/vehicles'
+
+        headers = {
+            'x-api-key': api_key,
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.post(url, headers=headers, json={"registrationNumber": reg})
+        response.raise_for_status()
+        result = response.json()
+
+        return {
+            'model': result.get('make', ''),
+            'year': int(result.get('yearOfManufacture', 0)),
+            'engine_code': result.get('engineNumber', '')
+        }
+
+    except Exception as e:
+        print(f"DVLA API error: {e}")
+        return {'error': 'Failed to fetch vehicle data.'}, 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
