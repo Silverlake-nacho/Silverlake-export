@@ -95,6 +95,14 @@
           </div>
         </div>
         <button type="submit" class="btn btn-primary">Search</button>
+        <!-- Right-Side DVLA Info Table -->
+        <div class="col-md-6">
+          <h5 class="mb-3">DVLA Vehicle Info</h5>
+          <table class="table table-bordered table-sm" id="dvlaInfoTable" style="display: none;">
+            <tbody id="dvlaInfoBody"></tbody>
+          </table>
+        </div>
+      </div>	
 
 </form>
 
@@ -188,8 +196,71 @@
       });
     </script>
 
+<script>
+async function fetchVehicleData() {
+    const reg = document.getElementById('registration').value.trim();
+    if (!reg) return alert("Please enter a registration.");
+
+    try {
+        const response = await fetch(`/lookup_registration?reg=${encodeURIComponent(reg)}`);
+        const data = await response.json();
+
+        if (data.error) {
+            alert(data.error);
+            document.getElementById("dvlaInfoTable").style.display = "none";
+        } else {
+            // Auto-fill fields
+            document.querySelector('[name="model"]').value = data.model || '';
+            document.querySelector('[name="year"]').value = data.year || '';
+            document.querySelector('[name="engine_code"]').value = data.engine_code || '';
+
+            // Populate the DVLA info table
+            const tableBody = document.getElementById("dvlaInfoBody");
+            tableBody.innerHTML = "";
+            for (const [key, value] of Object.entries(data)) {
+                const row = document.createElement("tr");
+                row.innerHTML = `<th>${key}</th><td>${value}</td>`;
+                tableBody.appendChild(row);
+            }
+            document.getElementById("dvlaInfoTable").style.display = "table";
+        }
+    } catch (err) {
+        console.error("Error fetching registration data:", err);
+        alert("Something went wrong looking up the registration.");
+    }
+}
+</script>
+
+
 </body>
 
+<script>
+  $(document).ready(function() {
+    $('#ebayButton').on('click', function() {
+      const model = $('input[name="model"]').val().trim();
+      const year = $('input[name="year"]').val().trim();
+      if (!model || !year) {
+        alert("Please enter both model and year first.");
+        return;
+      }
+
+      $('#ebayModalBody').html('<p>Loading...</p>');
+      $('#ebayModal').modal('show');
+
+      $.ajax({
+        url: '/ebay_small_parts',
+        method: 'GET',
+        data: { model: model, year: year },
+        success: function(data) {
+          $('#ebayModalBody').html(data);
+        },
+        error: function() {
+          $('#ebayModalBody').html('<p>Error loading data.</p>');
+        }
+      });
+    });
+  });
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
