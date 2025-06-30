@@ -186,7 +186,7 @@ def lookup_registration():
         return {'error': 'No registration provided'}, 400
 
     try:
-        api_key = '9GlyMJQUdd318S6wsPFEh8Zd0oSm3GaD6gkddqm0'
+        api_key = 'G7jQjk2Cnv2LDMEZiBp0l1XXwfBrhHlS3b6qLYqY'
         url = 'https://driver-vehicle-licensing.api.gov.uk/vehicle-enquiry/v1/vehicles'
 
         headers = {
