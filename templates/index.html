@@ -54,6 +54,24 @@
         max-width: 100%;
         height: auto;
       }
+      .table-green th, .table-green td {
+        background-color: #d6f5c1;  /* light green background */
+        color: #333;                /* dark text for readability */
+      }
+
+      .table-green th {
+        background-color: #5c9c13;  /* darker green for headers */
+        color: white;
+      }
+
+      .table-green tr:nth-child(even) td {
+        background-color: #c8e6a0;  /* alternate row shading */
+      }
+
+      .table-green td, .table-green th {
+        border: 1px solid #5c9c13;
+      }
+
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
@@ -114,7 +132,7 @@
     <div class="col-md-6">
       <h5 class="mb-3" style="color: #5c9c13;">Vehicle Info (Pinnacle VIN Decode)</h5>
       <div class="table-responsive rounded shadow">
-        <table class="table table-striped table-dark table-bordered table-sm" id="dvlaInfoTable" style="display: none;">
+        <table class="table table-bordered table-sm table-green" id="dvlaInfoTable" style="display: none;">
           <tbody id="dvlaInfoBody"></tbody>
         </table>
       </div>
