@@ -207,6 +207,7 @@ def lookup_registration():
         vehicle_info = {item['key']: item['value'] for item in data}
 
         return {
+            'manufacturer': vehicle_info.get('MAKE', ''),
             'model': vehicle_info.get('MODEL', ''),
             'year': int(vehicle_info.get('MODEL_YEAR', 0) or vehicle_info.get('FIRST_REGISTERED', '0')[:4]),
             'engine_code': vehicle_info.get('GetVehicles.DataArea.Vehicles.Vehicle.EngineModelCode', '')
