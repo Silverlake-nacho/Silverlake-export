@@ -6,6 +6,7 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
+import base64
 
 import requests
 from bs4 import BeautifulSoup
@@ -186,26 +187,33 @@ def lookup_registration():
         return {'error': 'No registration provided'}, 400
 
     try:
-        api_key = 'G7jQjk2Cnv2LDMEZiBp0l1XXwfBrhHlS3b6qLYqY'
-        url = 'https://driver-vehicle-licensing.api.gov.uk/vehicle-enquiry/v1/vehicles'
+        # Provide your own credentials here
+        username = 'silverlake2'
+        password = 'Myth0l0gicalBeast'
+        credentials = f"{username}:{password}"
+        auth_header = base64.b64encode(credentials.encode()).decode()
 
+        url = f"http://api.carparts-uk.com/ops/v1/decode/vrm/{reg}"
         headers = {
-            'x-api-key': api_key,
-            'Content-Type': 'application/json'
+            'Authorization': f'Basic {auth_header}',
+            'Accept': 'application/json'
         }
 
-        response = requests.post(url, headers=headers, json={"registrationNumber": reg})
+        response = requests.get(url, headers=headers)
         response.raise_for_status()
-        result = response.json()
+        data = response.json()
+
+        # Convert list of dicts into key-value pairs
+        vehicle_info = {item['key']: item['value'] for item in data}
 
         return {
-            'model': result.get('make', ''),
-            'year': int(result.get('yearOfManufacture', 0)),
-            'engine_code': result.get('engineNumber', '')
+            'model': vehicle_info.get('MODEL', ''),
+            'year': int(vehicle_info.get('MODEL_YEAR', 0) or vehicle_info.get('FIRST_REGISTERED', '0')[:4]),
+            'engine_code': vehicle_info.get('GetVehicles.DataArea.Vehicles.Vehicle.EngineModelCode', '')
         }
 
     except Exception as e:
-        print(f"DVLA API error: {e}")
+        print(f"VIN Decode API error: {e}")
         return {'error': 'Failed to fetch vehicle data.'}, 500
 
 if __name__ == '__main__':
