@@ -141,11 +141,11 @@
 </form>
 
       {% if search_details %}
-      <h2 class="mt-5">Top Parts for {{ search_details.model }} (Year {{ search_details.year }}) {% if search_details.engine_code %} Engine: {{ search_details.engine_code }} {% endif %}</h2>
+      <h2 class="mt-5">Engine Export for {{ search_details.model }} (Year {{ search_details.year }}) {% if search_details.engine_code %} Engine: {{ search_details.engine_code }} {% endif %}</h2>
       {% endif %}
 
       {% if google_sheet_matches %}
-<h2 class="mt-5">Google Sheet Matches for Engine Code</h2>
+<h2 class="mt-5">Export Matches for Engine Code {{ search_details.engine_code }}</h2>
 <table class="table table-striped mt-3">
    {% set excluded_keys = [] %}
   <thead>
