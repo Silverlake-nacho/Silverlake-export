@@ -171,13 +171,13 @@ def index():
 
         google_sheet_matches = []
 
-        if engine_code_input:
+        if engine_code:
             first_code, second_code = '', ''
-        if '(' in engine_code_input and ')' in engine_code_input:
-            first_code = engine_code_input.split('(')[0].strip()
-            second_code = engine_code_input.split('(')[1].split(')')[0].strip()
+        if '(' in engine_code and ')' in engine_code:
+            first_code = engine_code.split('(')[0].strip()
+            second_code = engine_code.split('(')[1].split(')')[0].strip()
         else:
-            first_code = engine_code_input
+            first_code = engine_code
 
         # First try with first code
         if first_code:
