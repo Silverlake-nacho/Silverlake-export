@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, send_file, redirect, url_for, session
+from flask import Flask, request, render_template, send_file, redirect, url_for, session, jsonify
 import pandas as pd
 from io import BytesIO
 from datetime import datetime, timedelta
@@ -7,6 +7,8 @@ from oauth2client.service_account import ServiceAccountCredentials
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 import base64
+
+import xml.etree.ElementTree as ET
 
 import requests
 from bs4 import BeautifulSoup
@@ -179,6 +181,70 @@ def download():
         output.seek(0)
         return send_file(output, download_name="parts_opportunity.xlsx", as_attachment=True)
     return "No data to download", 400
+
+from flask import Flask, request, jsonify
+import requests
+import xml.etree.ElementTree as ET
+
+@app.route('/lookup_registration_carweb')
+def lookup_registration_carweb():
+    reg = request.args.get('reg', '').strip().upper()
+    if not reg:
+        return {'error': 'No registration provided'}, 400
+# {"UserName":"Silverlake",
+ #   "Version":"0.31.1",
+  #  "ServiceURL":"https://www1.carwebuk.com/CarweBVrrB2Bproxy/carwebVrrWebService.asmx",
+   # "ClientDescription":"Silverlake Carbuyer",
+   # "ClientRef":"Silverlake",
+   # "Key":"lp22020411nM","Password":"Mn0929ap"}
+    try:
+        username = 'Silverlake'
+        password = 'Mn0929ap'
+        validator_key = 'lp22020411nM'
+        client_ref = 'Silverlake'
+        client_desc = 'Silverlake Carbuyer'
+        version = '0.31.1'
+
+        # Prepare Carweb request
+        params = {
+            'strUserName': username,
+            'strPassword': password,
+            'strKey1': validator_key,
+            'strClientRef': client_ref,
+            'strClientDescription': client_desc,
+            'strVRM': reg,
+            'strVersion': version,
+        }
+
+        url = "https://ws.carwebuk.com/CarweBVRRB2Bproxy/carwebvrrwebservice.asmx/strB2BGetVehicleByVRM"
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+
+        # Parse XML
+        root = ET.fromstring(response.text)
+
+        # Example: extract Combined_Make and Combined_Model
+        combined_make = root.find('.//Combined_Make')
+        combined_model = root.find('.//Combined_Model')
+        engine_code = root.find('.//EngineModelCode')
+        model_year = root.find('.//ManufacturerModelYr')
+
+        result = {
+            'Manufacturer': combined_make.text if combined_make is not None else '',
+            'Model': combined_model.text if combined_model is not None else '',
+            'Engine Code': engine_code.text if engine_code is not None else '',
+            'Model Year': model_year.text if model_year is not None else '',
+        }
+
+        return jsonify(result)
+
+    except requests.RequestException as e:
+        print(f"Carweb API request failed: {e}")
+        return {'error': 'Failed to connect to Carweb API.'}, 502
+    except ET.ParseError as e:
+        print(f"XML parsing error: {e}")
+        return {'error': 'Failed to parse Carweb API response.'}, 500
+
 
 @app.route('/lookup_registration')
 def lookup_registration():
