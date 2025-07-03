@@ -227,13 +227,17 @@ def lookup_registration_carweb():
         combined_make = root.find('.//Combined_Make')
         combined_model = root.find('.//Combined_Model')
         engine_code = root.find('.//EngineModelCode')
-        model_year = root.find('.//ManufacturerModelYr')
+        model_year = root.find('.//DVLAYearOfManufacture')
+        model_series = root.find('.//ModelSeries')
+        power_BHP = root.find('.//MaximumPowerBHP')
 
         result = {
             'model': combined_model.text if combined_model is not None else '',
             'year': int(model_year.text) if model_year is not None and model_year.text.isdigit() else '',
             'engine_code': engine_code.text if engine_code is not None else '',
             'manufacturer': combined_make.text if combined_make is not None else '',
+            'model_series': model_series.text if model_series is not None else '',
+            'power_BHP': int(power_BHP.text) if power_BHP is not None and power_BHP.text.isdigit() else '',
         }
         return jsonify(result)
 
