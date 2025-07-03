@@ -233,12 +233,16 @@
     </script>
 
 <script>
-async function fetchVehicleData() {
+async function fetchVehicleData(source) {
     const reg = document.getElementById('registration').value.trim();
     if (!reg) return alert("Please enter a registration.");
 
+    const url = source === 'carweb'
+      ? `/lookup_registration_carweb?reg=${encodeURIComponent(reg)}`
+      : `/lookup_registration?reg=${encodeURIComponent(reg)}`;
+
     try {
-        const response = await fetch(`/lookup_registration?reg=${encodeURIComponent(reg)}`);
+        const response = await fetch(url);
         const data = await response.json();
 
         if (data.error) {
@@ -265,6 +269,7 @@ async function fetchVehicleData() {
         alert("Something went wrong looking up the registration.");
     }
 }
+
 </script>
 
 
