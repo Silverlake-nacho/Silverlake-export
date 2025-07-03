@@ -191,9 +191,9 @@ def lookup_registration_carweb():
     reg = request.args.get('reg', '').strip().upper()
     if not reg:
         return {'error': 'No registration provided'}, 400
-# {"UserName":"Silverlake",
- #   "Version":"0.31.1",
-  #  "ServiceURL":"https://www1.carwebuk.com/CarweBVrrB2Bproxy/carwebVrrWebService.asmx",
+   # {"UserName":"Silverlake",
+   #  "Version":"0.31.1",
+   #  "ServiceURL":"https://www1.carwebuk.com/CarweBVrrB2Bproxy/carwebVrrWebService.asmx",
    # "ClientDescription":"Silverlake Carbuyer",
    # "ClientRef":"Silverlake",
    # "Key":"lp22020411nM","Password":"Mn0929ap"}
@@ -230,13 +230,12 @@ def lookup_registration_carweb():
         model_year = root.find('.//ManufacturerModelYr')
 
         result = {
-            'Manufacturer': combined_make.text if combined_make is not None else '',
-            'Model': combined_model.text if combined_model is not None else '',
-            'Engine Code': engine_code.text if engine_code is not None else '',
-            'Model Year': model_year.text if model_year is not None else '',
-        }
-
-        return jsonify(result)
+            'model': combined_model.text if combined_model is not None else '',
+            'year': int(model_year.text) if model_year is not None and model_year.text.isdigit() else '',
+            'engine_code': engine_code.text if engine_code is not None else '',
+            'manufacturer': combined_make.text if combined_make is not None else '',
+         }
+         return jsonify(result)
 
     except requests.RequestException as e:
         print(f"Carweb API request failed: {e}")
