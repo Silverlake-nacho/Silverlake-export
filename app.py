@@ -227,6 +227,12 @@ def lookup_registration_carweb():
         combined_make = root.find('.//Combined_Make')
         combined_model = root.find('.//Combined_Model')
         engine_code = root.find('.//EngineModelCode')
+            if engine_code is not None and engine_code.text:
+                # Extract everything before the first space or first '('
+                raw_engine_code = engine_code.text.strip()
+                first_part = raw_engine_code.split()[0].split('(')[0].strip()
+            else:
+                first_part = ''
         model_year = root.find('.//DVLAYearOfManufacture')
         model_series = root.find('.//ModelSeries')
         power_BHP = root.find('.//MaximumPowerBHP')
@@ -234,7 +240,7 @@ def lookup_registration_carweb():
         result = {
             'model': combined_model.text if combined_model is not None else '',
             'year': int(model_year.text) if model_year is not None and model_year.text.isdigit() else '',
-            'engine_code': engine_code.text if engine_code is not None else '',
+            'engine_code': first_part,
             'manufacturer': combined_make.text if combined_make is not None else '',
             'model_series': model_series.text if model_series is not None else '',
             'power_BHP': int(power_BHP.text) if power_BHP is not None and power_BHP.text.isdigit() else '',
