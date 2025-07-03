@@ -234,8 +234,8 @@ def lookup_registration_carweb():
             'year': int(model_year.text) if model_year is not None and model_year.text.isdigit() else '',
             'engine_code': engine_code.text if engine_code is not None else '',
             'manufacturer': combined_make.text if combined_make is not None else '',
-         }
-    return jsonify(result)
+        }
+        return jsonify(result)
 
     except requests.RequestException as e:
         print(f"Carweb API request failed: {e}")
