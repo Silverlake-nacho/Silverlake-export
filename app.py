@@ -285,8 +285,8 @@ def lookup_registration_carweb():
     # 1️⃣ Check cache first
     cached = get_cached_lookup(reg)
     if cached:
-    print(f"Using cached Carweb data for {reg}")
-    return jsonify(cached)
+        print(f"Using cached Carweb data for {reg}")
+        return jsonify(cached)
 
     
     
