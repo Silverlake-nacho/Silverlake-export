@@ -253,37 +253,34 @@ def lookup_registration_carweb():
         url = "https://ws.carwebuk.com/CarweBVRRB2Bproxy/carwebvrrwebservice.asmx/strB2BGetVehicleByVRM"
         response = requests.get(url, params=params, timeout=10)
         response.raise_for_status()
-        
-        response = requests.get(url, params=params, timeout=10)
-        response.raise_for_status()
 
         print("Carweb raw response:")
         print(response.text)
        
-        # Parse XML
+        # Parse XML robustly
         root = ET.fromstring(response.text)
 
-        # Example: extract Combined_Make and Combined_Model
-        combined_make = root.find('.//Combined_Make')
-        combined_model = root.find('.//Combined_Model')
-        engine_code = root.find('.//EngineModelCode')
-       # if engine_code is not None and engine_code.text:
-            # Extract everything before the first space or first '('
-          #  raw_engine_code = engine_code.text.strip()
-          #  first_part = raw_engine_code.split()[0].split('(')[0].strip()
-       # else:
-        #    first_part = ''
-        model_year = root.find('.//DVLAYearOfManufacture')
-        model_series = root.find('.//ModelSeries')
-        power_BHP = root.find('.//MaximumPowerBHP')
+        def find_text(root, tag):
+            """Find first occurrence of tag ignoring namespace."""
+            for elem in root.iter():
+                if elem.tag.endswith(tag):
+                    return elem.text.strip() if elem.text else ''
+            return ''
+
+        combined_make = find_text(root, 'Combined_Make')
+        combined_model = find_text(root, 'Combined_Model')
+        engine_code = find_text(root, 'EngineModelCode')
+        model_year = find_text(root, 'DVLAYearOfManufacture')
+        model_series = find_text(root, 'ModelSeries')
+        power_BHP = find_text(root, 'MaximumPowerBHP')
 
         result = {
-            'model': combined_model.text if combined_model is not None else '',
-            'year': int(model_year.text) if model_year is not None and model_year.text.isdigit() else '',
-            'engine_code': engine_code.text if engine_code is not None else '',
-            'manufacturer': combined_make.text if combined_make is not None else '',
-            'model_series': model_series.text if model_series is not None else '',
-            'power_BHP': int(power_BHP.text) if power_BHP is not None and power_BHP.text.isdigit() else '',
+            'model': combined_model,
+            'year': int(model_year) if model_year.isdigit() else '',
+            'engine_code': engine_code,
+            'manufacturer': combined_make,
+            'model_series': model_series,
+            'power_BHP': int(float(power_BHP)) if power_BHP.replace('.', '', 1).isdigit() else '',
         }
         return jsonify(result)
 
