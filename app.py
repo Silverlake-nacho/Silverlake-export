@@ -253,7 +253,13 @@ def lookup_registration_carweb():
         url = "https://ws.carwebuk.com/CarweBVRRB2Bproxy/carwebvrrwebservice.asmx/strB2BGetVehicleByVRM"
         response = requests.get(url, params=params, timeout=10)
         response.raise_for_status()
+        
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
 
+        print("Carweb raw response:")
+        print(response.text)
+       
         # Parse XML
         root = ET.fromstring(response.text)
 
