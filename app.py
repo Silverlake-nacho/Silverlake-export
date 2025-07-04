@@ -291,7 +291,7 @@ def lookup_registration_carweb():
         print(f"XML parsing error: {e}")
         return {'error': 'Failed to parse Carweb API response.'}, 500
 
-
+#Pinnacle Vin Decode
 @app.route('/lookup_registration')
 def lookup_registration():
     reg = request.args.get('reg', '').strip().upper()
