@@ -117,12 +117,12 @@
         <label for="registration" class="form-label">Vehicle Registration (UK)</label>
       <div class="input-group align-items-center">
         <span class="input-group-text p-0 border-0 bg-transparent">
-          #<img src="https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg" alt="UK Flag" style="height: 35px; border: 1px solid black; border-radius: 2px;">
+          <!--<img src="https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg" alt="UK Flag" style="height: 35px; border: 1px solid black; border-radius: 2px;">-->
 	  <img src="{{ url_for('static', filename='UK reg badge.png') }}" alt="UK Flag" style="height: 35px; border: 1px solid black; border-radius: 2px;">
         </span>
         <input type="text" class="form-control" id="registration" name="registration" placeholder="e.g. AB12CDE" pattern="[A-Z0-9]{2,7}" title="2-7 letters/numbers, no spaces" required>
         <button class="btn btn-secondary" type="button" onclick="fetchVehicleData('carweb')">Auto-fill Carweb</button>
-       # <button class="btn btn-secondary" type="button" onclick="fetchVehicleData('pinnacle')">Auto-fill Pinnacle</button>
+       <!--<button class="btn btn-secondary" type="button" onclick="fetchVehicleData('pinnacle')">Auto-fill Pinnacle</button>-->
       </div>
 
       </div>
