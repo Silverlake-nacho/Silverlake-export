@@ -8,6 +8,24 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 import base64
 
+import sqlite3
+
+conn = sqlite3.connect('carweb_cache.db')
+c = conn.cursor()
+c.execute("""
+CREATE TABLE IF NOT EXISTS carweb_cache (
+  reg TEXT PRIMARY KEY,
+  model TEXT,
+  year INTEGER,
+  engine_code TEXT,
+  manufacturer TEXT,
+  model_series TEXT,
+  power_BHP INTEGER
+)
+""")
+conn.commit()
+conn.close()
+
 import xml.etree.ElementTree as ET
 
 import requests
@@ -20,6 +38,41 @@ def rgb_to_hex(rgb):
     g = int(rgb.get('green', 1) * 255)
     b = int(rgb.get('blue', 1) * 255)
     return '#{:02X}{:02X}{:02X}'.format(r, g, b)
+
+def get_cached_lookup(reg):
+    conn = sqlite3.connect('carweb_cache.db')
+    c = conn.cursor()
+    c.execute("SELECT model, year, engine_code, manufacturer, model_series, power_BHP FROM carweb_cache WHERE reg = ?", (reg,))
+    row = c.fetchone()
+    conn.close()
+    if row:
+        return {
+            'model': row[0],
+            'year': row[1],
+            'engine_code': row[2],
+            'manufacturer': row[3],
+            'model_series': row[4],
+            'power_BHP': row[5],
+        }
+    return None
+
+def save_lookup_to_cache(reg, result):
+    conn = sqlite3.connect('carweb_cache.db')
+    c = conn.cursor()
+    c.execute("""
+        INSERT OR REPLACE INTO carweb_cache (reg, model, year, engine_code, manufacturer, model_series, power_BHP)
+        VALUES (?, ?, ?, ?, ?, ?, ?)""",
+        (
+            reg,
+            result['model'],
+            result['year'],
+            result['engine_code'],
+            result['manufacturer'],
+            result['model_series'],
+            result['power_BHP'],
+        ))
+    conn.commit()
+    conn.close()
 
 def get_matching_google_sheet_rows(engine_code):
     try:
@@ -228,12 +281,22 @@ def lookup_registration_carweb():
     reg = request.args.get('reg', '').strip().upper()
     if not reg:
         return {'error': 'No registration provided'}, 400
+
+    # 1️⃣ Check cache first
+    cached = get_cached_lookup(reg)
+    if cached:
+    print(f"Using cached Carweb data for {reg}")
+    return jsonify(cached)
+
+    
+    
    # {"UserName":"Silverlake",
    #  "Version":"0.31.1",
    #  "ServiceURL":"https://www1.carwebuk.com/CarweBVrrB2Bproxy/carwebVrrWebService.asmx",
    # "ClientDescription":"Silverlake Carbuyer",
    # "ClientRef":"Silverlake",
    # "Key":"lp22020411nM","Password":"Mn0929ap"}
+    # 2️⃣ Make Carweb API call only if not cached
     try:
         username = 'Silverlake'
         password = 'Mn0929ap'
@@ -285,6 +348,9 @@ def lookup_registration_carweb():
             'model_series': model_series,
             'power_BHP': int(float(power_BHP)) if power_BHP.replace('.', '', 1).isdigit() else '',
         }
+        # 3️⃣ Save the result in the cache
+        save_lookup_to_cache(reg, result)
+        
         return jsonify(result)
 
     except requests.RequestException as e:
