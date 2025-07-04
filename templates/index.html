@@ -124,8 +124,7 @@
         <button class="btn btn-secondary" type="button" onclick="fetchVehicleData('carweb')">Auto-fill Carweb</button>
        <!--<button class="btn btn-secondary" type="button" onclick="fetchVehicleData('pinnacle')">Auto-fill Pinnacle</button>-->
       </div>
-
-      </div>
+    </div>
 
       <div class="mb-3">
         <label class="form-label">Model</label>
@@ -142,17 +141,24 @@
         <label class="form-label">Engine Code (Optional)</label>
         <input type="text" name="engine_code" class="form-control" id="engine_code_field">
       </div>
+      <!-- Hidden fields for vehicle info -->
+      <input type="hidden" name="vehicle_info_model" id="vehicle_info_model">
+      <input type="hidden" name="vehicle_info_year" id="vehicle_info_year">
+      <input type="hidden" name="vehicle_info_engine_code" id="vehicle_info_engine_code">  
 	    
       <button type="submit" class="btn btn-primary">Search</button>
-      
     </div>
 
     <!-- Right-Side DVLA Info Table -->
     <div class="col-md-6">
       <h5 class="mb-3" style="color: #5c9c13;">Vehicle Info</h5>
       <div class="table-responsive rounded shadow">
-        <table class="table table-bordered table-sm table-green" id="dvlaInfoTable" style="display: none;">
-          <tbody id="dvlaInfoBody"></tbody>
+        <table class="table table-bordered table-sm table-green">
+          <tbody>
+            <tr><th>Model</th><td>{{ vehicle_info.model }}</td></tr>
+            <tr><th>Year</th><td>{{ vehicle_info.year }}</td></tr>
+            <tr><th>Engine Code</th><td>{{ vehicle_info.engine_code }}</td></tr>
+          </tbody>
         </table>
       </div>
     </div>
@@ -277,6 +283,11 @@ async function fetchVehicleData(source) {
             document.querySelector('[name="model"]').value = data.model || '';
             document.querySelector('[name="year"]').value = data.year || '';
             document.querySelector('[name="engine_code"]').value = data.engine_code || '';
+
+	    // Also populate hidden fields so info persists on Search
+            document.getElementById('vehicle_info_model').value = data.model || '';
+            document.getElementById('vehicle_info_year').value = data.year || '';
+            document.getElementById('vehicle_info_engine_code').value = data.engine_code || '';
 
             // Populate the DVLA info table
             const tableBody = document.getElementById("dvlaInfoBody");
