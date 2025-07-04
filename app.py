@@ -146,6 +146,8 @@ def index():
             'model': request.form.get('vehicle_info_model', ''),
             'year': request.form.get('vehicle_info_year', ''),
             'engine_code': request.form.get('vehicle_info_engine_code', ''),
+            'manufacturer': request.form.get('vehicle_info_manufacturer', ''),
+            'power_BHP': request.form.get('vehicle_info_power_BHP', ''),
         }      
 
         filtered = df[
