@@ -290,6 +290,7 @@ async function fetchVehicleData(source) {
             document.getElementById('vehicle_info_model').value = data.model || '';
             document.getElementById('vehicle_info_year').value = data.year || '';
             document.getElementById('vehicle_info_engine_code').value = data.engine_code || '';
+	    document.getElementById('vehicle_info_power_BHP').value = data.power_BHP || '';
 
             // Populate the DVLA info table
             const tableBody = document.getElementById("dvlaInfoBody");
@@ -303,7 +304,7 @@ async function fetchVehicleData(source) {
         }
     } catch (err) {
         console.error("Error fetching registration data:", err);
-        alert("Something went wrong looking up the registration.");
+       // alert("Something went wrong looking up the registration.");
     }
 }
 
