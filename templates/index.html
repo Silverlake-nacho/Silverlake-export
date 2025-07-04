@@ -121,7 +121,7 @@
 	  <img src="{{ url_for('static', filename='UK reg badge.png') }}" alt="UK Flag" style="height: 40px; border: 1px solid black; border-radius: 2px;">
         </span>
         <input type="text" class="form-control" id="registration" name="registration" placeholder="e.g. AB12CDE" pattern="[A-Z0-9]{2,7}" title="2-7 letters/numbers, no spaces" required>
-        <button class="btn btn-secondary" type="button" onclick="fetchVehicleData('carweb')">Auto-fill Carweb</button>
+        <button class="btn btn-secondary" type="button" onclick="fetchVehicleData('carweb')">Auto-fill</button>
        <!--<button class="btn btn-secondary" type="button" onclick="fetchVehicleData('pinnacle')">Auto-fill Pinnacle</button>-->
       </div>
     </div>
@@ -155,9 +155,11 @@
       <div class="table-responsive rounded shadow">
         <table class="table table-bordered table-sm table-green">
           <tbody>
+	    <tr><th>Manufacturer</th><td>{{ vehicle_info.manufacturer }}</td></tr>
             <tr><th>Model</th><td>{{ vehicle_info.model }}</td></tr>
             <tr><th>Year</th><td>{{ vehicle_info.year }}</td></tr>
             <tr><th>Engine Code</th><td>{{ vehicle_info.engine_code }}</td></tr>
+	    <tr><th>Power BHP</th><td>{{ vehicle_info.power_BHP }}</td></tr>
           </tbody>
         </table>
       </div>
