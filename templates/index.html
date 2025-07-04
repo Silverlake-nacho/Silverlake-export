@@ -118,7 +118,7 @@
       <div class="input-group align-items-center">
         <span class="input-group-text p-0 border-0 bg-transparent">
           <!--<img src="https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg" alt="UK Flag" style="height: 35px; border: 1px solid black; border-radius: 2px;">-->
-	  <img src="{{ url_for('static', filename='UK reg badge.png') }}" alt="UK Flag" style="height: 40px; border: 1px solid black; border-radius: 2px;">
+	  <img src="{{ url_for('static', filename='UK reg badge.png') }}" alt="UK Flag" style="height: 50px; border: 1px solid black; border-radius: 2px;">
         </span>
         <input type="text" class="form-control" id="registration" name="registration" placeholder="e.g. AB12CDE" pattern="[A-Z0-9]{2,7}" title="2-7 letters/numbers, no spaces" required>
         <button class="btn btn-secondary" type="button" onclick="fetchVehicleData('carweb')">Auto-fill</button>
@@ -142,9 +142,11 @@
         <input type="text" name="engine_code" class="form-control" id="engine_code_field">
       </div>
       <!-- Hidden fields for vehicle info -->
+      <input type="hidden" name="vehicle_info_manufacturer" id="vehicle_info_manufacturer">
       <input type="hidden" name="vehicle_info_model" id="vehicle_info_model">
       <input type="hidden" name="vehicle_info_year" id="vehicle_info_year">
       <input type="hidden" name="vehicle_info_engine_code" id="vehicle_info_engine_code">  
+      <input type="hidden" name="vehicle_info_power_BHP" id="vehicle_info_power_BHP">
 	    
       <button type="submit" class="btn btn-primary">Search</button>
     </div>
@@ -287,6 +289,7 @@ async function fetchVehicleData(source) {
             document.querySelector('[name="engine_code"]').value = data.engine_code || '';
 
 	    // Also populate hidden fields so info persists on Search
+	    document.getElementById('vehicle_info_manufacturer').value = data.manufacturer || '';
             document.getElementById('vehicle_info_model').value = data.model || '';
             document.getElementById('vehicle_info_year').value = data.year || '';
             document.getElementById('vehicle_info_engine_code').value = data.engine_code || '';
