@@ -127,12 +127,26 @@ def index():
     global last_search_result, search_details
     parts = None
     google_sheet_matches = []
+
+    vehicle_info = {
+        'model': '',
+        'year': '',
+        'engine_code': '',
+    }    
+    
     if request.method == 'POST':
         model = request.form['model']
         year = int(request.form['year'])
         engine_code = request.form.get('engine_code', '').strip()
         min_price = request.form.get('min_price')
         min_opportunity = request.form.get('min_opportunity')
+
+        # Pick up vehicle info from hidden fields so we can show it after search
+        vehicle_info = {
+            'model': request.form.get('vehicle_info_model', ''),
+            'year': request.form.get('vehicle_info_year', ''),
+            'engine_code': request.form.get('vehicle_info_engine_code', ''),
+        }      
 
         filtered = df[
             (df['Model'].str.lower() == model.lower()) &
@@ -169,6 +183,7 @@ def index():
        # if engine_code:
          #   google_sheet_matches = get_matching_google_sheet_rows(engine_code)
 
+        # Google Sheet search: fallback logic
         google_sheet_matches = []
 
         if engine_code:
@@ -187,9 +202,9 @@ def index():
         if not google_sheet_matches and second_code:
             google_sheet_matches = get_matching_google_sheet_rows(second_code)
 
-
-    return render_template('index.html', parts=parts, search_details=search_details, google_sheet_matches=google_sheet_matches)
-
+    return render_template('index.html', parts=parts, search_details=search_details,
+                           google_sheet_matches=google_sheet_matches, vehicle_info=vehicle_info)
+    
 @app.route('/download')
 def download():
     global last_search_result
