@@ -388,7 +388,7 @@ def lookup_registration_carweb():
             'power_BHP': int(float(power_BHP)) if power_BHP.replace('.', '', 1).isdigit() else '',
         }
         # 3️⃣ Save the result in the cache
-        save_lookup_to_cache(reg, result
+        save_lookup_to_cache(reg, result)
 
         if 'logged_in' in session and session.get('logged_in'):
             log_user_lookup(session.get('username', 'unknown'), reg, result)
