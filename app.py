@@ -10,7 +10,10 @@ import base64
 
 import sqlite3
 
-conn = sqlite3.connect('carweb_cache.db')
+DB_PATH = 'carweb_cache.db'
+
+# Initialize cache table
+conn = sqlite3.connect(DB_PATH)
 c = conn.cursor()
 c.execute("""
 CREATE TABLE IF NOT EXISTS carweb_cache (
@@ -21,6 +24,21 @@ CREATE TABLE IF NOT EXISTS carweb_cache (
   manufacturer TEXT,
   model_series TEXT,
   power_BHP INTEGER
+)
+""")
+# Initialize search history table
+c.execute("""
+CREATE TABLE IF NOT EXISTS user_lookups (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  username TEXT,
+  reg TEXT,
+  model TEXT,
+  year INTEGER,
+  engine_code TEXT,
+  manufacturer TEXT,
+  model_series TEXT,
+  power_BHP INTEGER,
+  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
 )
 """)
 conn.commit()
@@ -40,7 +58,7 @@ def rgb_to_hex(rgb):
     return '#{:02X}{:02X}{:02X}'.format(r, g, b)
 
 def get_cached_lookup(reg):
-    conn = sqlite3.connect('carweb_cache.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("SELECT model, year, engine_code, manufacturer, model_series, power_BHP FROM carweb_cache WHERE reg = ?", (reg,))
     row = c.fetchone()
@@ -57,7 +75,7 @@ def get_cached_lookup(reg):
     return None
 
 def save_lookup_to_cache(reg, result):
-    conn = sqlite3.connect('carweb_cache.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
         INSERT OR REPLACE INTO carweb_cache (reg, model, year, engine_code, manufacturer, model_series, power_BHP)
@@ -71,6 +89,25 @@ def save_lookup_to_cache(reg, result):
             result['model_series'],
             result['power_BHP'],
         ))
+    conn.commit()
+    conn.close()
+
+def log_user_lookup(username, reg, vehicle_data):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("""
+        INSERT INTO user_lookups (username, reg, model, year, engine_code, manufacturer, model_series, power_BHP)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        username,
+        reg,
+        vehicle_data.get('model', ''),
+        vehicle_data.get('year', ''),
+        vehicle_data.get('engine_code', ''),
+        vehicle_data.get('manufacturer', ''),
+        vehicle_data.get('model_series', ''),
+        vehicle_data.get('power_BHP', '')
+    ))
     conn.commit()
     conn.close()
 
@@ -286,6 +323,8 @@ def lookup_registration_carweb():
     cached = get_cached_lookup(reg)
     if cached:
         print(f"Using cached Carweb data for {reg}")
+        if 'logged_in' in session and session.get('logged_in'):
+            log_user_lookup(session.get('username', 'unknown'), reg, cached)
         return jsonify(cached)
 
     
@@ -349,7 +388,10 @@ def lookup_registration_carweb():
             'power_BHP': int(float(power_BHP)) if power_BHP.replace('.', '', 1).isdigit() else '',
         }
         # 3️⃣ Save the result in the cache
-        save_lookup_to_cache(reg, result)
+        save_lookup_to_cache(reg, result
+
+        if 'logged_in' in session and session.get('logged_in'):
+            log_user_lookup(session.get('username', 'unknown'), reg, result)
         
         return jsonify(result)
 
@@ -359,6 +401,26 @@ def lookup_registration_carweb():
     except ET.ParseError as e:
         print(f"XML parsing error: {e}")
         return {'error': 'Failed to parse Carweb API response.'}, 500
+
+@app.route('/search_history')
+def search_history():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+
+    username = session.get('username', 'unknown')
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("""
+        SELECT reg, model, year, engine_code, manufacturer, model_series, power_BHP, timestamp
+        FROM user_lookups
+        WHERE username=?
+        ORDER BY timestamp DESC
+    """, (username,))
+    history = c.fetchall()
+    conn.close()
+
+    return render_template('search_history.html', history=history, username=username)
+
 
 #Pinnacle Vin Decode
 @app.route('/lookup_registration')
