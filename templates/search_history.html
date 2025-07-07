@@ -1,11 +1,127 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Search History</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="p-4">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Silverlake Part Sales Opportunity Finder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <style>
+      body {
+        background: url("{{ url_for('static', filename='background.jpg') }}") no-repeat center center fixed;
+        background-size: cover;
+        font-family: 'Montserrat', sans-serif;
+        color: black;
+      }
+      h1, h2, label {
+        color: #5c9c13;
+      }
+      .btn-primary, .btn-success {
+        background-color: #5c9c13;
+        border: none;
+      }
+      .btn-primary:hover, .btn-success:hover {
+        background-color: #4a8010;
+      }
+      .form-control {
+        background-color: #d6f5c1;
+        color: #333;
+        border: 1px solid #333;
+      }
+      .form-control:focus {
+        border-color: #5c9c13;
+        box-shadow: 0 0 5px #5c9c13;
+      }
+      table {
+        color: #f0f0f0;
+        background-color: #111;
+      }
+	    
+      .table-green {
+      table-layout: fixed;
+      width: 100%;
+      }
+
+      .table-green th, .table-green td {
+      width: 50%;
+      word-wrap: break-word;
+      }
+    
+      th, td {
+        border-bottom: 1px solid #5c9c13;
+      }
+      #model-suggestions {
+        background-color: #d6f5c1;
+        color: #333;
+        border: 1px solid #5c9c13;
+      }
+      #registration {
+        font-family: 'Oswald', sans-serif;
+        font-weight: bold;
+        font-size: 1.5rem;
+        background-color: #fdee00; /* classic number plate yellow */
+        color: black;
+        border: 3px solid black;
+        border-radius: 5px;
+        text-transform: uppercase; /* force uppercase display */
+        letter-spacing: 0.15rem;
+        text-align: center;
+        max-width: 250px; /* reasonable plate size */
+      }
+      .logo {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .logo img {
+        width: 300px;
+        max-width: 100%;
+        height: auto;
+      }
+      .table-green th, .table-green td {
+        background-color: #d6f5c1;  /* light green background */
+        color: #333;                /* dark text for readability */
+      }
+
+      .table-green th {
+        background-color: #5c9c13;  /* darker green for headers */
+        color: white;
+      }
+
+      .table-green tr:nth-child(even) td {
+        background-color: #c8e6a0;  /* alternate row shading */
+      }
+
+      .table-green td, .table-green th {
+        border: 1px solid #5c9c13;
+      }
+
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+  </head>
+  <body class="p-4">
+    <div class="container">
+	<div class="logo">
+        <img src="{{ url_for('static', filename='logo-slg-strip.svg') }}" alt="Silverlake Logo">
+      </div>
+
+      <!-- Navbar -->
+      <nav class="navbar navbar-expand-lg navbar-dark mb-4" style="background-color: #5c9c13; border-radius: 10px;">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">
+            <img src="{{ url_for('static', filename='logo-slg-strip.svg') }}" alt="Silverlake Logo" style="height: 30px;">
+          </a>
+	  <div class="nav-item">
+          <a class="nav-link text-white" href="{{ url_for('search_history') }}">Reg History</a>
+          </div>
+          <div class="d-flex">
+            <a href="{{ url_for('logout') }}" class="btn btn-light">Logout</a>
+          </div>
+        </div>
+      </nav>
+
+      <h1 class="mb-4 text-center">Registration History</h1>
 <div class="container">
   <h2>Search History for {{ username }}</h2>
   <table class="table table-striped mt-3">
