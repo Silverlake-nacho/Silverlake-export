@@ -9,8 +9,8 @@ from googleapiclient.discovery import build
 import base64
 
 import sqlite3
-
-DB_PATH = 'carweb_cache.db'
+import os
+DB_PATH = os.path.join('/var/data', 'carweb_cache.db')
 
 # Initialize cache table
 conn = sqlite3.connect(DB_PATH)
