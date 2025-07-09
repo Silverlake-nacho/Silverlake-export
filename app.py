@@ -45,7 +45,7 @@ conn.commit()
 conn.close()
 
 import xml.etree.ElementTree as ET
-from flask_login import current_user
+
 import requests
 from bs4 import BeautifulSoup
 from flask import request, render_template_string
@@ -192,7 +192,7 @@ def logout():
     return redirect(url_for('login'))
 
 @app.before_request
-def require_login():
+
     allowed_routes = ['login', 'static', 'autocomplete_model']
     if request.endpoint not in allowed_routes and not session.get('logged_in'):
         return redirect(url_for('login'))
@@ -404,11 +404,9 @@ def lookup_registration_carweb():
         return {'error': 'Failed to parse Carweb API response.'}, 500
       
 @app.route('/search_history')
-@login_required
 def search_history():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
-    username = current_user.username
     username = session.get('username', 'unknown')
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
