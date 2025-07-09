@@ -192,10 +192,11 @@ def logout():
     return redirect(url_for('login'))
 
 @app.before_request
-
+def require_login():
     allowed_routes = ['login', 'static', 'autocomplete_model']
     if request.endpoint not in allowed_routes and not session.get('logged_in'):
         return redirect(url_for('login'))
+      
     if session.get('logged_in'):
         login_time = session.get('login_time')
         if login_time:
