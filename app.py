@@ -45,7 +45,7 @@ conn.commit()
 conn.close()
 
 import xml.etree.ElementTree as ET
-
+from flask_login import current_user
 import requests
 from bs4 import BeautifulSoup
 from flask import request, render_template_string
@@ -177,6 +177,7 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        session['username'] = username
         if username in USERS and USERS[username] == password:
             session['logged_in'] = True
             session['login_time'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
@@ -401,12 +402,13 @@ def lookup_registration_carweb():
     except ET.ParseError as e:
         print(f"XML parsing error: {e}")
         return {'error': 'Failed to parse Carweb API response.'}, 500
-
+      
 @app.route('/search_history')
+@login_required
 def search_history():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
-
+    username = current_user.username
     username = session.get('username', 'unknown')
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
