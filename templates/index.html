@@ -246,16 +246,31 @@ function addToCart(item) {
   alert("Item added to cart!");
 }
 
+
 function renderCart() {
   const list = document.getElementById('cart-list');
   list.innerHTML = '';
+
   cart.forEach((item, index) => {
     const li = document.createElement('li');
     li.className = 'list-group-item';
-    let summary = Object.entries(item).slice(0, 2).map(([k, v]) => `${v}`).join(' - ');
-    li.innerHTML = `${summary} <button class="btn btn-sm btn-danger float-end" onclick="removeFromCart(${index})">Remove</button>`;
+
+    let table = '<table class="table table-sm table-bordered mb-1">';
+    for (const [key, val] of Object.entries(item)) {
+      table += `<tr><th style="width: 30%;">${key}</th><td>${val}</td></tr>`;
+    }
+    table += '</table>';
+
+    li.innerHTML = `
+      ${table}
+      <button class="btn btn-sm btn-danger float-end" onclick="removeFromCart(${index})">Remove</button>
+    `;
     list.appendChild(li);
   });
+
+  const button = document.getElementById('send-request-btn');
+  button.style.display = cart.length > 0 ? 'inline-block' : 'none';
+
 
   // Show/hide cart section
   const button = document.getElementById('send-request-btn');
