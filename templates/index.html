@@ -229,11 +229,12 @@
     {% endfor %}
   </tbody>
 </table>
-{% endif %}
+
 <h3>Selected Parts</h3>
 <ul id="cart-list" class="list-group mb-3"></ul>
 <button class="btn btn-primary" onclick="sendCart()">Send Request</button>
-
+{% endif %}
+	    
 <!-- Always-loaded cart logic -->
 <script>
 let cart = [];
@@ -250,8 +251,8 @@ function renderCart() {
   cart.forEach((item, index) => {
     const li = document.createElement('li');
     li.className = 'list-group-item';
-    let summary = Object.entries(item).slice(0, 2).map(([k, v]) => ${v}).join(' - ');
-    li.innerHTML = ${summary} <button class="btn btn-sm btn-danger float-end" onclick="removeFromCart(${index})">Remove</button>;
+    let summary = Object.entries(item).slice(0, 2).map(([k, v]) => `${v}`).join(' - ');
+    li.innerHTML = `${summary} <button class="btn btn-sm btn-danger float-end" onclick="removeFromCart(${index})">Remove</button>`;
     list.appendChild(li);
   });
 }
@@ -324,7 +325,7 @@ window.onload = function() {
     {% endfor %}
   </tbody>
 </table>
-
+{% endif %}
 	    
     </div>
 
@@ -396,10 +397,9 @@ async function fetchVehicleData(source) {
     const reg = document.getElementById('registration').value.trim();
     if (!reg) return alert("Please enter a registration.");
 
-const url = source === 'carweb'
-  ? `/lookup_registration_carweb?reg=${encodeURIComponent(reg)}`
-  : `/lookup_registration?reg=${encodeURIComponent(reg)}`;
-
+    const url = source === 'carweb'
+      ? `/lookup_registration_carweb?reg=${encodeURIComponent(reg)}`
+      : `/lookup_registration?reg=${encodeURIComponent(reg)}`;
 
     try {
         const response = await fetch(url);
@@ -427,7 +427,7 @@ const url = source === 'carweb'
             tableBody.innerHTML = "";
             for (const [key, value] of Object.entries(data)) {
                 const row = document.createElement("tr");
-                row.innerHTML = <th>${key}</th><td>${value}</td>;
+                row.innerHTML = `<th>${key}</th><td>${value}</td>`;
                 tableBody.appendChild(row);
             }
             document.getElementById("dvlaInfoTable").style.display = "table";
@@ -440,11 +440,10 @@ const url = source === 'carweb'
 
 </script>
 
-{% endif %}
+
 </body>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </html>
-
 
