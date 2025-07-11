@@ -299,25 +299,27 @@ window.onload = function() {
 	    
       {% if google_sheet_matches %}
 <h2 class="mt-5">Export Matches for Engine Code {{ search_details.engine_code }}</h2>
-<table class="table table-striped mt-3">
-   {% set excluded_keys = [] %}
+<table class="table table-striped table-green">
+  {% set excluded_keys = [] %}
   <thead>
     <tr>
-      {% for key in google_sheet_matches[0].keys() %}
-        {% if key not in excluded_keys %}
-         <th>{{ key }}</th>
-        {% endif %}
+      {% for key in google_sheet_matches[0].keys() if key not in excluded_keys %}
+        <th>{{ key }}</th>
       {% endfor %}
+      <th>Add</th>
     </tr>
   </thead>
   <tbody>
     {% for row in google_sheet_matches %}
     <tr>
-      {% for cell in row.values() %}
-       {% if key not in excluded_keys %}
-         <td style="background-color: {{ cell.bg }}">{{ cell.value }}</td>
-       {% endif %}
+      {% set row_data = {} %}
+      {% for key, cell in row.items() %}
+        {% if key not in excluded_keys %}
+          {% set _ = row_data.update({key: cell.value}) %}
+          <td style="background-color: {{ cell.bg }}">{{ cell.value }}</td>
+        {% endif %}
       {% endfor %}
+      <td><button class="btn btn-sm btn-success" onclick='addToCart({{ row_data | tojson | safe }})'>+</button></td>
     </tr>
     {% endfor %}
   </tbody>
