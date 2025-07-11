@@ -206,7 +206,97 @@
       {% if search_details %}
       <h2 class="mt-5">Engine Export for {{ search_details.model }} (Year {{ search_details.year }}) {% if search_details.engine_code %} Engine: {{ search_details.engine_code }} {% endif %}</h2>
       {% endif %}
+<!-- Cart UI for Matching Parts -->
+{% if parts %}
+<h2 class="mt-5">Matching Parts</h2>
+<table class="table table-striped table-green">
+  <thead>
+    <tr>
+      {% for col in parts[0].keys() %}
+        <th>{{ col }}</th>
+      {% endfor %}
+      <th>Add</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for part in parts %}
+    <tr>
+      {% for val in part.values() %}
+        <td>{{ val }}</td>
+      {% endfor %}
+      <td><button type="button" class="btn btn-sm btn-success" onclick='addToCart({{ part|tojson|safe }})'>+</button></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
+<h3>Selected Parts</h3>
+<ul id="cart-list" class="list-group mb-3"></ul>
+<button class="btn btn-primary" onclick="sendCart()">Send Request</button>
+{% endif %}
+
+<script>
+let cart = [];
+
+function addToCart(item) {
+  cart.push(item);
+  renderCart();
+  sessionStorage.setItem('cart', JSON.stringify(cart));
+}
+
+function renderCart() {
+  const list = document.getElementById('cart-list');
+  list.innerHTML = '';
+  cart.forEach((item, index) => {
+    const li = document.createElement('li');
+    li.className = 'list-group-item';
+    li.innerHTML = `${item.Part} - ${item['IC Description']} <button class="btn btn-sm btn-danger float-end" onclick="removeFromCart(${index})">Remove</button>`;
+    list.appendChild(li);
+  });
+}
+
+function removeFromCart(index) {
+  cart.splice(index, 1);
+  renderCart();
+  sessionStorage.setItem('cart', JSON.stringify(cart));
+}
+
+function sendCart() {
+  if (cart.length === 0) {
+    alert("Cart is empty!");
+    return;
+  }
+
+  fetch('/send_cart_email', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ cart })
+  })
+  .then(response => response.json())
+  .then(data => {
+    alert(data.message || "Cart sent!");
+    cart = [];
+    renderCart();
+    sessionStorage.removeItem('cart');
+  })
+  .catch(err => {
+    console.error("Error sending cart:", err);
+    alert("Failed to send cart.");
+  });
+}
+
+window.onload = function() {
+  const saved = sessionStorage.getItem('cart');
+  if (saved) {
+    cart = JSON.parse(saved);
+    renderCart();
+  }
+}
+</script>
+
+
+
+	    
       {% if google_sheet_matches %}
 <h2 class="mt-5">Export Matches for Engine Code {{ search_details.engine_code }}</h2>
 <table class="table table-striped mt-3">
