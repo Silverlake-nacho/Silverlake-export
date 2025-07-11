@@ -233,8 +233,8 @@
 <h3>Selected Parts</h3>
 <ul id="cart-list" class="list-group mb-3"></ul>
 <button class="btn btn-primary" onclick="sendCart()">Send Request</button>
-{% endif %}
 
+<!-- Always-loaded cart logic -->
 <script>
 let cart = [];
 
@@ -250,7 +250,8 @@ function renderCart() {
   cart.forEach((item, index) => {
     const li = document.createElement('li');
     li.className = 'list-group-item';
-    li.innerHTML = `${item.Part} - ${item['IC Description']} <button class="btn btn-sm btn-danger float-end" onclick="removeFromCart(${index})">Remove</button>`;
+    let summary = Object.entries(item).slice(0, 2).map(([k, v]) => `${v}`).join(' - ');
+    li.innerHTML = `${summary} <button class="btn btn-sm btn-danger float-end" onclick="removeFromCart(${index})">Remove</button>`;
     list.appendChild(li);
   });
 }
