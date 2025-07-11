@@ -230,10 +230,12 @@
   </tbody>
 </table>
 
+{% endif %}
+
 <h3>Selected Parts</h3>
 <ul id="cart-list" class="list-group mb-3"></ul>
 <button class="btn btn-primary" onclick="sendCart()">Send Request</button>
-{% endif %}
+
 	    
 <!-- Always-loaded cart logic -->
 <script>
@@ -242,6 +244,7 @@ let cart = [];
 function addToCart(item) {
   cart.push(item);
   renderCart();
+  alert("Item added to cart!");
   sessionStorage.setItem('cart', JSON.stringify(cart));
 }
 
@@ -255,7 +258,16 @@ function renderCart() {
     li.innerHTML = `${summary} <button class="btn btn-sm btn-danger float-end" onclick="removeFromCart(${index})">Remove</button>`;
     list.appendChild(li);
   });
+
+  // Show/hide cart section
+  const button = document.getElementById('send-request-btn');
+  if (cart.length > 0) {
+    button.style.display = 'inline-block';
+  } else {
+    button.style.display = 'none';
+  }
 }
+
 
 function removeFromCart(index) {
   cart.splice(index, 1);
