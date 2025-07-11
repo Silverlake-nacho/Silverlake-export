@@ -243,8 +243,8 @@ let cart = [];
 
 function addToCart(item) {
   cart.push(item);
-  renderCart();
   alert("Item added to cart!");
+  renderCart();
   sessionStorage.setItem('cart', JSON.stringify(cart));
 }
 
