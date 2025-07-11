@@ -245,6 +245,7 @@ function addToCart(item) {
   cart.push(item);
   renderCart();
   sessionStorage.setItem('cart', JSON.stringify(cart));
+  alert("Item added to cart!");
 }
 
 function renderCart() {
