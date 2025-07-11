@@ -396,9 +396,10 @@ async function fetchVehicleData(source) {
     const reg = document.getElementById('registration').value.trim();
     if (!reg) return alert("Please enter a registration.");
 
-    const url = source === 'carweb'
-      ? /lookup_registration_carweb?reg=${encodeURIComponent(reg)}
-      : /lookup_registration?reg=${encodeURIComponent(reg)};
+const url = source === 'carweb'
+  ? `/lookup_registration_carweb?reg=${encodeURIComponent(reg)}`
+  : `/lookup_registration?reg=${encodeURIComponent(reg)}`;
+
 
     try {
         const response = await fetch(url);
