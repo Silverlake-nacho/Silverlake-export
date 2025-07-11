@@ -8,6 +8,10 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 import base64
 
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 import sqlite3
 import os
 DB_PATH = os.path.join('/var/data', 'carweb_cache.db')
@@ -421,6 +425,49 @@ def search_history():
     conn.close()
 
     return render_template('search_history.html', history=history, username=username)
+
+@app.route('/send_cart_email', methods=['POST'])
+def send_cart_email():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Not logged in'}), 401
+
+    data = request.get_json()
+    cart = data.get('cart', [])
+
+    if not cart:
+        return jsonify({'error': 'Cart is empty'}), 400
+
+    username = session.get('username', 'unknown')
+    subject = f"Parts Request from {username}"
+    body = "Parts requested:\n\n"
+
+    for part in cart:
+        line = ", ".join(f"{key}: {val}" for key, val in part.items())
+        body += line + "\n"
+
+    # Email configuration (adjust as needed)
+    sender_email = "nacho@silverlake.co.uk"
+    recipient_email = "nacho@silverlake.co.uk"
+    smtp_server = "smtp.office365.com"
+    smtp_port = 587
+    smtp_user = "nacho@silverlake.co.uk"
+    smtp_password = "!Cab34783"
+
+    msg = MIMEMultipart()
+    msg['From'] = sender_email
+    msg['To'] = recipient_email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(body, 'plain'))
+
+    try:
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_user, smtp_password)
+            server.send_message(msg)
+        return jsonify({'message': 'Request sent successfully!'})
+    except Exception as e:
+        print("Email error:", e)
+        return jsonify({'error': 'Failed to send email'}), 500
 
 
 #Pinnacle Vin Decode
