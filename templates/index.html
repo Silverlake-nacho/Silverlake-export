@@ -180,6 +180,7 @@
       <input type="hidden" name="vehicle_info_engine_code" id="vehicle_info_engine_code">  
       <input type="hidden" name="vehicle_info_power_BHP" id="vehicle_info_power_BHP">
       <input type="hidden" name="vehicle_info_model_series" id="vehicle_info_model_series">
+      <input type="hidden" name="vehicle_info_engine_capacity" id="vehicle_info_engine_capacity">
 	    
       <button type="submit" class="btn btn-primary">Search</button>
     </div>
@@ -196,6 +197,7 @@
             <tr><th>Engine Code</th><td>{{ vehicle_info.engine_code }}</td></tr>
 	    <tr><th>Power BHP</th><td>{{ vehicle_info.power_BHP }}</td></tr>
 	    <tr><th>Model Series</th><td>{{ vehicle_info.model_series }}</td></tr>
+	    <tr><th>Engine Size</th><td>{{ vehicle_info.engine_capacity }}</td></tr>
           </tbody>
         </table>
       </div>
@@ -433,6 +435,7 @@ async function fetchVehicleData(source) {
             document.getElementById('vehicle_info_engine_code').value = data.engine_code || '';
 	    document.getElementById('vehicle_info_power_BHP').value = data.power_BHP || '';
 	    document.getElementById('vehicle_info_model_series').value = data.model_series || '';
+	    document.getElementById('vehicle_info_engine_capacity').value = data.engine_capacity || '';
 
             // Populate the DVLA info table
             const tableBody = document.getElementById("dvlaInfoBody");
