@@ -66,7 +66,7 @@ def rgb_to_hex(rgb):
 def get_cached_lookup(reg):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    c.execute("SELECT model, year, engine_code, manufacturer, model_series, power_BHP FROM carweb_cache WHERE reg = ?", (reg,))
+    c.execute("SELECT model, year, engine_code, manufacturer, model_series, power_BHP,engine_capacity FROM carweb_cache WHERE reg = ?", (reg,))
     row = c.fetchone()
     conn.close()
     if row:
