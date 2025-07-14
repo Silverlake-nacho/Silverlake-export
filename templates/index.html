@@ -269,8 +269,9 @@ function renderCart() {
     li.className = 'list-group-item';
     
     // Define which fields to show
-    const fieldsToShow = ['Make', 'MODEL', 'ENGINE CODE', 'FUEL',  'MAN/AUTO', 'ENG SIZE', 'PRICE'];
-
+    const fieldsToShow = ['Make', 'Model', 'Engine Code', 'Fuel', 'Man/Auto', 'Eng Size', 'Price'];
+    console.log("Cart item keys:", Object.keys(cart[0]));
+	  
     // Create a mini table
     let tableHTML = `<table class="table table-bordered table-sm mb-2"><tbody>`;
     fieldsToShow.forEach(key => {
