@@ -86,7 +86,7 @@ def save_lookup_to_cache(reg, result):
     c = conn.cursor()
     c.execute("""
         INSERT OR REPLACE INTO carweb_cache (reg, model, year, engine_code, manufacturer, model_series, power_BHP, engine_capacity)
-        VALUES (?, ?, ?, ?, ?, ?, ?)""",
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
         (
             reg,
             result['model'],
@@ -105,7 +105,7 @@ def log_user_lookup(username, reg, vehicle_data):
     c = conn.cursor()
     c.execute("""
         INSERT INTO user_lookups (username, reg, model, year, engine_code, manufacturer, model_series, power_BHP, engine_capacity)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         username,
         reg,
