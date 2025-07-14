@@ -20,7 +20,7 @@ DB_PATH = os.path.join('/var/data', 'carweb_cache.db')
 conn = sqlite3.connect(DB_PATH)
 c = conn.cursor()
 c.execute("""
-CREATE OR REPLACE carweb_cache (
+CREATE TABLE IF NOT EXISTS carweb_cache (
   reg TEXT PRIMARY KEY,
   model TEXT,
   year INTEGER,
@@ -29,11 +29,14 @@ CREATE OR REPLACE carweb_cache (
   model_series TEXT,
   power_BHP INTEGER,
   engine_capacity INTEGER
+
+ALTER TABLE carweb_cache
+  ADD engine_capacity INTEGER;
 )
 """)
 # Initialize search history table
 c.execute("""
-CREATE OR REPLACE user_lookups (
+CREATE TABLE IF NOT EXISTS user_lookups (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT,
   reg TEXT,
@@ -45,6 +48,9 @@ CREATE OR REPLACE user_lookups (
   power_BHP INTEGER,
   engine_capacity INTEGER,
   timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+
+ALTER TABLE user_lookups
+  ADD engine_capacity INTEGER;
 )
 """)
 conn.commit()
