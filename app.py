@@ -29,9 +29,6 @@ CREATE TABLE IF NOT EXISTS carweb_cache (
   model_series TEXT,
   power_BHP INTEGER,
   engine_capacity INTEGER
-
-ALTER TABLE carweb_cache
-  ADD engine_capacity INTEGER;
 )
 """)
 # Initialize search history table
@@ -46,11 +43,8 @@ CREATE TABLE IF NOT EXISTS user_lookups (
   manufacturer TEXT,
   model_series TEXT,
   power_BHP INTEGER,
+  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
   engine_capacity INTEGER,
-  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-
-ALTER TABLE user_lookups
-  ADD engine_capacity INTEGER;
 )
 """)
 conn.commit()
