@@ -237,6 +237,7 @@
 <h3>Selected Parts</h3>
 <ul id="cart-list" class="list-group mb-3"></ul>
 <button class="btn btn-primary" onclick="sendCart()">Send Request</button>
+<button class="btn btn-danger" onclick="clearCart()">Clear Cart</button>
 
 	    
 <!-- Always-loaded cart logic -->
@@ -261,6 +262,12 @@ function renderCart() {
     list.appendChild(li);
   });
 
+    if (cart.length > 0) {
+    sessionStorage.setItem('cart', JSON.stringify(cart));
+  } else {
+    sessionStorage.removeItem('cart'); // 🔁 Add this to clear if cart is empty
+  }
+  
   // Show/hide cart section
   const button = document.getElementById('send-request-btn');
   if (cart.length > 0) {
@@ -270,6 +277,11 @@ function renderCart() {
   }
 }
 
+function clearCart() {
+  cart = [];
+  sessionStorage.removeItem('cart');
+  renderCart();
+}
 
 function removeFromCart(index) {
   cart.splice(index, 1);
