@@ -20,7 +20,7 @@ DB_PATH = os.path.join('/var/data', 'carweb_cache.db')
 conn = sqlite3.connect(DB_PATH)
 c = conn.cursor()
 c.execute("""
-CREATE TABLE IF NOT EXISTS carweb_cache (
+CREATE TABLE carweb_cache (
   reg TEXT PRIMARY KEY,
   model TEXT,
   year INTEGER,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS carweb_cache (
 """)
 # Initialize search history table
 c.execute("""
-CREATE TABLE IF NOT EXISTS user_lookups (
+CREATE TABLE user_lookups (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT,
   reg TEXT,
@@ -66,7 +66,7 @@ def rgb_to_hex(rgb):
 def get_cached_lookup(reg):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    c.execute("SELECT model, year, engine_code, manufacturer, model_series, power_BHP,engine_capacity FROM carweb_cache WHERE reg = ?", (reg,))
+    c.execute("SELECT model, year, engine_code, manufacturer, model_series, power_BHP, engine_capacity FROM carweb_cache WHERE reg = ?", (reg,))
     row = c.fetchone()
     conn.close()
     if row:
