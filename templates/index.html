@@ -85,6 +85,16 @@
         text-align: center;
         max-width: 250px; /* reasonable plate size */
       }
+
+      #cart-list table {
+      background-color: #fff;
+      font-size: 0.9rem;
+      }
+
+      #cart-list th {
+      background-color: #e0f3d6;
+      width: 40%;
+      }
       .logo {
         text-align: center;
         margin-bottom: 20px;
@@ -257,11 +267,25 @@ function renderCart() {
   cart.forEach((item, index) => {
     const li = document.createElement('li');
     li.className = 'list-group-item';
-    let summary = Object.entries(item).slice(0, 2).map(([k, v]) => `${v}`).join(' - ');
-    li.innerHTML = `${summary} <button class="btn btn-sm btn-danger float-end" onclick="removeFromCart(${index})">Remove</button>`;
+    
+    // Define which fields to show
+    const fieldsToShow = ['MAKE', 'MODEL', 'ENGINE CODE', 'FUEL',  'MAN/AUTO', 'ENG SIZE', 'PRICE'];
+
+    // Create a mini table
+    let tableHTML = `<table class="table table-bordered table-sm mb-2"><tbody>`;
+    fieldsToShow.forEach(key => {
+      if (item[key] !== undefined) {
+        tableHTML += `<tr><th>${key}</th><td>${item[key]}</td></tr>`;
+      }
+    });
+    tableHTML += `</tbody></table>`;
+   
+	  
+    li.innerHTML = tableHTML + `<button class="btn btn-sm btn-danger float-end" onclick="removeFromCart(${index})">Remove</button>`;
     list.appendChild(li);
   });
 
+  // Clean up sessionStorage
     if (cart.length > 0) {
     sessionStorage.setItem('cart', JSON.stringify(cart));
   } else {
