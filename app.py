@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS user_lookups (
   model_series TEXT,
   power_BHP INTEGER,
   timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-  engine_capacity INTEGER,
+  engine_capacity INTEGER
 )
 """)
 conn.commit()
