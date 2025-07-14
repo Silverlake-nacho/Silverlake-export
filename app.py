@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS carweb_cache (
   manufacturer TEXT,
   model_series TEXT,
   power_BHP INTEGER,
-   engine_capacity INTEGER
+  engine_capacity INTEGER
 )
 """)
 # Initialize search history table
@@ -85,7 +85,7 @@ def save_lookup_to_cache(reg, result):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
-        INSERT OR REPLACE INTO carweb_cache (reg, model, year, engine_code, manufacturer, model_series, power_BHP)
+        INSERT OR REPLACE INTO carweb_cache (reg, model, year, engine_code, manufacturer, model_series, power_BHP, engine_capacity)
         VALUES (?, ?, ?, ?, ?, ?, ?)""",
         (
             reg,
@@ -104,7 +104,7 @@ def log_user_lookup(username, reg, vehicle_data):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
-        INSERT INTO user_lookups (username, reg, model, year, engine_code, manufacturer, model_series, power_BHP)
+        INSERT INTO user_lookups (username, reg, model, year, engine_code, manufacturer, model_series, power_BHP, engine_capacity)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         username,
