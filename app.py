@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS carweb_cache (
   engine_code TEXT,
   manufacturer TEXT,
   model_series TEXT,
-  power_BHP INTEGER
+  power_BHP INTEGER,
+   engine_capacity INTEGER
 )
 """)
 # Initialize search history table
@@ -42,6 +43,7 @@ CREATE TABLE IF NOT EXISTS user_lookups (
   manufacturer TEXT,
   model_series TEXT,
   power_BHP INTEGER,
+  engine_capacity INTEGER,
   timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
 )
 """)
@@ -75,6 +77,7 @@ def get_cached_lookup(reg):
             'manufacturer': row[3],
             'model_series': row[4],
             'power_BHP': row[5],
+            'engine_capacity': row[6],
         }
     return None
 
@@ -92,6 +95,7 @@ def save_lookup_to_cache(reg, result):
             result['manufacturer'],
             result['model_series'],
             result['power_BHP'],
+            result['engine_capacity'],
         ))
     conn.commit()
     conn.close()
@@ -110,7 +114,8 @@ def log_user_lookup(username, reg, vehicle_data):
         vehicle_data.get('engine_code', ''),
         vehicle_data.get('manufacturer', ''),
         vehicle_data.get('model_series', ''),
-        vehicle_data.get('power_BHP', '')
+        vehicle_data.get('power_BHP', ''),
+        vehicle_data.get('engine_capacity', '')
     ))
     conn.commit()
     conn.close()
@@ -245,6 +250,8 @@ def index():
             'manufacturer': request.form.get('vehicle_info_manufacturer', ''),
             'power_BHP': request.form.get('vehicle_info_power_BHP', ''),
             'model_series': request.form.get('vehicle_info_model_series', ''),
+            'engine_capacity': request.form.get('vehicle_info_engine_capacity', ''),
+            
         }      
 
         filtered = df[
@@ -360,6 +367,7 @@ def lookup_registration_carweb():
         model_year = find_text(root, 'DVLAYearOfManufacture')
         model_series = find_text(root, 'ModelSeries')
         power_BHP = find_text(root, 'MaximumPowerBHP')
+        engine_capacity = find_text(root, 'Combined_EngineCapacity')
 
         result = {
             'model': combined_model,
@@ -368,6 +376,7 @@ def lookup_registration_carweb():
             'manufacturer': combined_make,
             'model_series': model_series,
             'power_BHP': int(float(power_BHP)) if power_BHP.replace('.', '', 1).isdigit() else '',
+            'engine_capacity': int(float(engine_capacity)) if engine_capacity.replace('.', '', 1).isdigit() else '',
         }
         # 3️⃣ Save the result in the cache
         save_lookup_to_cache(reg, result)
