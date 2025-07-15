@@ -308,13 +308,18 @@
 	    
 <!-- Always-loaded cart logic -->
 <script>
+	
+const username = "{{ username }}";
+const CART_KEY = `cart_${username}`;
 let cart = [];
+
 
 function addToCart(item) {
   cart.push(item);
   alert("Item added to cart!");
   renderCart();
-  sessionStorage.setItem('cart', JSON.stringify(cart));
+  localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  saveCartToServer();
 }
 
 function renderCart() {
@@ -376,11 +381,11 @@ function renderCart() {
     tableBody.appendChild(totalRow);
   }
 
-  // Clean up sessionStorage
+  // Clean up localStorage
     if (cart.length > 0) {
-    sessionStorage.setItem('cart', JSON.stringify(cart));
+    localStorage.setItem(CART_KEY, JSON.stringify(cart));
   } else {
-    sessionStorage.removeItem('cart'); // 🔁 Add this to clear if cart is empty
+    localStorage.removeItem(CART_KEY); // 🔁 Add this to clear if cart is empty
   }
   
   // Show/hide cart section
@@ -392,16 +397,18 @@ function renderCart() {
   }
 }
 
-function clearCart() {
+async function clearCart() {
   cart = [];
-  sessionStorage.removeItem('cart');
+  localStorage.removeItem(CART_KEY);
   renderCart();
+  await saveCartToServer(); // clear server too
 }
 
 function removeFromCart(index) {
   cart.splice(index, 1);
   renderCart();
-  sessionStorage.setItem('cart', JSON.stringify(cart));
+  localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  saveCartToServer();
 }
 
 function sendCart() {
@@ -420,7 +427,7 @@ function sendCart() {
     alert(data.message || "Cart sent!");
     cart = [];
     renderCart();
-    sessionStorage.removeItem('cart');
+    localStorage.removeItem(CART_KEY);
   })
   .catch(err => {
     console.error("Error sending cart:", err);
@@ -428,13 +435,25 @@ function sendCart() {
   });
 }
 
-window.onload = function() {
-  const saved = sessionStorage.getItem('cart');
+window.onload = async function () {
+  const saved = localStorage.getItem(CART_KEY);
   if (saved) {
     cart = JSON.parse(saved);
     renderCart();
+  } else {
+    // Try loading from server
+    try {
+      const res = await fetch('/load_cart');
+      const data = await res.json();
+      cart = data.cart || [];
+      renderCart();
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    } catch (err) {
+      console.error("Failed to load cart from server:", err);
+    }
   }
 }
+
 </script>
 
 </div>
@@ -503,6 +522,20 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <script>
+
+async function saveCartToServer() {
+  try {
+    await fetch('/save_cart', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cart })
+    });
+  } catch (err) {
+    console.error("Failed to save cart to server:", err);
+  }
+}
+
+	
 async function fetchVehicleData(source) {
     const reg = document.getElementById('registration').value.trim();
     if (!reg) return alert("Please enter a registration.");
