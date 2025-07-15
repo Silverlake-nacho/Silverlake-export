@@ -86,12 +86,12 @@
         max-width: 250px; /* reasonable plate size */
       }
 
-      #cart-list table {
+      #cart-table table {
       background-color: #fff;
       font-size: 0.9rem;
       }
 
-      #cart-list th {
+      #cart-table th {
       background-color: #e0f3d6;
       width: 40%;
       }
@@ -283,6 +283,7 @@
 <table class="table table-bordered table-striped mt-3" id="cart-table">
   <thead>
     <tr>
+      <th>Id</th>
       <th>Make</th>
       <th>Model</th>
       <th>Engine Code</th>
@@ -316,15 +317,30 @@ function renderCart() {
 
   const fieldsToShow = ['Make', 'Model', 'Engine Code', 'Fuel', 'Man/Auto', 'Eng Size', 'Price'];
 
+  let totalPrice = 0;
+
   cart.forEach((item, index) => {
     const row = document.createElement('tr');
 
+    // Row number
+    const rowNumber = document.createElement('td');
+    rowNumber.textContent = index + 1;
+    row.appendChild(rowNumber);
+	  
     fieldsToShow.forEach(key => {
       const cell = document.createElement('td');
-      cell.textContent = item[key] || '';
+      const val = item[key] || '';
+      cell.textContent = val;
+
+      // Accumulate price if valid
+      if (key === 'Price') {
+        const numeric = parseFloat(val.toString().replace(/[£,$]/g, ''));
+        if (!isNaN(numeric)) totalPrice += numeric;
+      }
+
       row.appendChild(cell);
     });
-
+	  
     // Add remove button
     const removeCell = document.createElement('td');
     removeCell.innerHTML = `<button class="btn btn-sm btn-danger" onclick="removeFromCart(${index})">Remove</button>`;
@@ -332,6 +348,27 @@ function renderCart() {
 
     tableBody.appendChild(row);
   });
+
+  // Total row
+  if (cart.length > 0) {
+    const totalRow = document.createElement('tr');
+
+    const totalLabelCell = document.createElement('td');
+    totalLabelCell.colSpan = 7;
+    totalLabelCell.className = 'text-end fw-bold';
+    totalLabelCell.textContent = 'Total:';
+    totalRow.appendChild(totalLabelCell);
+
+    const totalValueCell = document.createElement('td');
+    totalValueCell.className = 'fw-bold';
+    totalValueCell.textContent = `£${totalPrice.toFixed(2)}`;
+    totalRow.appendChild(totalValueCell);
+
+    // Empty remove cell
+    totalRow.appendChild(document.createElement('td'));
+
+    tableBody.appendChild(totalRow);
+  }
 
   // Clean up sessionStorage
     if (cart.length > 0) {
