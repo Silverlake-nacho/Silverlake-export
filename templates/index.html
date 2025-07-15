@@ -243,7 +243,41 @@
 </table>
 
 {% endif %}
+    
+{% if google_sheet_matches %}
+<h2 class="mt-5">Export Matches for Engine Code {{ search_details.engine_code }}</h2>
+<table class="table table-striped mt-3">
+  {% set excluded_keys = [] %}
+  <thead>
+    <tr>
+      {% for key in google_sheet_matches[0].keys() %}
+        {% if key not in excluded_keys %}
+          <th>{{ key }}</th>
+        {% endif %}
+      {% endfor %}
+      <th>Add</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in google_sheet_matches %}
+    <tr>
+      {% set row_data = {} %}
+      {% for key, cell in row.items() %}
+        {% if key not in excluded_keys %}
+          {% set _ = row_data.update({key: cell.value}) %}
+          <td style="background-color: {{ cell.bg }}">{{ cell.value }}</td>
+        {% endif %}
+      {% endfor %}
+      <td><button class="btn btn-sm btn-success" onclick='addToCart({{ row_data | tojson | safe }})'>+</button></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+	    
+    </div>
 
+	  
 <h3>Selected Parts</h3>
 <ul id="cart-list" class="list-group mb-3"></ul>
 <button class="btn btn-primary" onclick="sendCart()">Send Request</button>
@@ -346,40 +380,6 @@ window.onload = function() {
   }
 }
 </script>
-	    
-{% if google_sheet_matches %}
-<h2 class="mt-5">Export Matches for Engine Code {{ search_details.engine_code }}</h2>
-<table class="table table-striped mt-3">
-  {% set excluded_keys = [] %}
-  <thead>
-    <tr>
-      {% for key in google_sheet_matches[0].keys() %}
-        {% if key not in excluded_keys %}
-          <th>{{ key }}</th>
-        {% endif %}
-      {% endfor %}
-      <th>Add</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for row in google_sheet_matches %}
-    <tr>
-      {% set row_data = {} %}
-      {% for key, cell in row.items() %}
-        {% if key not in excluded_keys %}
-          {% set _ = row_data.update({key: cell.value}) %}
-          <td style="background-color: {{ cell.bg }}">{{ cell.value }}</td>
-        {% endif %}
-      {% endfor %}
-      <td><button class="btn btn-sm btn-success" onclick='addToCart({{ row_data | tojson | safe }})'>+</button></td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% endif %}
-	    
-    </div>
-
     <script>
       $(document).ready(function() {
         $('input[name="model"]').on('input', function() {
