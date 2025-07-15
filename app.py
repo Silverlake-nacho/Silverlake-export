@@ -50,6 +50,18 @@ CREATE TABLE IF NOT EXISTS user_lookups (
 conn.commit()
 conn.close()
 
+# Create table to store user carts
+conn = sqlite3.connect(DB_PATH)
+c = conn.cursor()
+c.execute("""
+CREATE TABLE IF NOT EXISTS user_carts (
+    username TEXT PRIMARY KEY,
+    cart_json TEXT
+)
+""")
+conn.commit()
+conn.close()
+
 import xml.etree.ElementTree as ET
 
 import requests
@@ -285,7 +297,7 @@ def index():
             google_sheet_matches = get_matching_google_sheet_rows(second_code)
 
     return render_template('index.html', parts=parts, search_details=search_details,
-                           google_sheet_matches=google_sheet_matches, vehicle_info=vehicle_info)
+                           google_sheet_matches=google_sheet_matches, vehicle_info=vehicle_info, username=session.get('username'))
     
 @app.route('/download')
 def download():
@@ -453,6 +465,44 @@ def send_cart_email():
     except Exception as e:
         print("Email error:", e)
         return jsonify({'error': 'Failed to send email'}), 500
+      
+@app.route('/save_cart', methods=['POST'])
+def save_cart():
+    if not session.get('logged_in'):
+        return {'error': 'Not logged in'}, 401
+
+    data = request.get_json()
+    username = session.get('username')
+    cart_json = json.dumps(data.get('cart', []))
+
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("""
+        INSERT INTO user_carts (username, cart_json)
+        VALUES (?, ?)
+        ON CONFLICT(username) DO UPDATE SET cart_json=excluded.cart_json
+    """, (username, cart_json))
+    conn.commit()
+    conn.close()
+
+    return {'message': 'Cart saved successfully'}
+
+@app.route('/load_cart')
+def load_cart():
+    if not session.get('logged_in'):
+        return {'error': 'Not logged in'}, 401
+
+    username = session.get('username')
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT cart_json FROM user_carts WHERE username = ?", (username,))
+    row = c.fetchone()
+    conn.close()
+
+    if row:
+        return {'cart': json.loads(row[0])}
+    else:
+        return {'cart': []}
 
 
 #Pinnacle Vin Decode
