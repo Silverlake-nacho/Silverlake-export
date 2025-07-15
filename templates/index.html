@@ -279,7 +279,22 @@
 
 	  
 <h3>Selected Parts</h3>
-<ul id="cart-list" class="list-group mb-3"></ul>
+	    
+<table class="table table-bordered table-striped mt-3" id="cart-table">
+  <thead>
+    <tr>
+      <th>Make</th>
+      <th>Model</th>
+      <th>Engine Code</th>
+      <th>Fuel</th>
+      <th>Man/Auto</th>
+      <th>Eng Size</th>
+      <th>Price</th>
+      <th>Remove</th>
+    </tr>
+  </thead>
+  <tbody id="cart-body"></tbody>
+</table>
 <button class="btn btn-primary" onclick="sendCart()">Send Request</button>
 <button class="btn btn-danger" onclick="clearCart()">Clear Cart</button>
 
@@ -296,28 +311,26 @@ function addToCart(item) {
 }
 
 function renderCart() {
-  const list = document.getElementById('cart-list');
-  list.innerHTML = '';
+  const tableBody = document.getElementById('cart-body');
+  tableBody.innerHTML = '';
+
+  const fieldsToShow = ['Make', 'Model', 'Engine Code', 'Fuel', 'Man/Auto', 'Eng Size', 'Price'];
+
   cart.forEach((item, index) => {
-    const li = document.createElement('li');
-    li.className = 'list-group-item';
-    
-    // Define which fields to show
-    const fieldsToShow = ['Make', 'Model', 'Engine Code', 'Fuel', 'Man/Auto', 'Eng Size', 'Price'];
-    console.log("Cart item keys:", Object.keys(cart[0]));
-	  
-    // Create a mini table
-    let tableHTML = `<table class="table table-bordered table-sm mb-2"><tbody>`;
+    const row = document.createElement('tr');
+
     fieldsToShow.forEach(key => {
-      if (item[key] !== undefined) {
-        tableHTML += `<tr><th>${key}</th><td>${item[key]}</td></tr>`;
-      }
+      const cell = document.createElement('td');
+      cell.textContent = item[key] || '';
+      row.appendChild(cell);
     });
-    tableHTML += `</tbody></table>`;
-   
-	  
-    li.innerHTML = tableHTML + `<button class="btn btn-sm btn-danger float-end" onclick="removeFromCart(${index})">Remove</button>`;
-    list.appendChild(li);
+
+    // Add remove button
+    const removeCell = document.createElement('td');
+    removeCell.innerHTML = `<button class="btn btn-sm btn-danger" onclick="removeFromCart(${index})">Remove</button>`;
+    row.appendChild(removeCell);
+
+    tableBody.appendChild(row);
   });
 
   // Clean up sessionStorage
