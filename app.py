@@ -177,7 +177,7 @@ def get_matching_google_sheet_rows(engine_code, manufacturer):
             code_list = [code.strip().lower() for code in codes_raw.split(",")]
           
             if engine_code.lower() in code_list and manufacturer.lower() == sheet_manufacturer.lower():
-                rows.append(row_dict))
+                rows.append(row_dict)
 
         return rows
 
