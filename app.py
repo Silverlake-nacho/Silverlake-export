@@ -167,7 +167,7 @@ def get_matching_google_sheet_rows(engine_code):
             # Defensive: skip row if engine_code_col_index >= length
             engine_code_cell = row[engine_code_col_index] if len(row) > engine_code_col_index else ""
 
-            if engine_code.lower() in engine_code_cell.lower():
+           if engine_code_cell.lower().startswith(engine_code.lower()):
                 # Build row dict only if match
                 row_dict = {}
                 for j, cell in enumerate(row):
