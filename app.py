@@ -132,7 +132,7 @@ def log_user_lookup(username, reg, vehicle_data):
     conn.commit()
     conn.close()
 
-def get_matching_google_sheet_rows(engine_code):
+def get_matching_google_sheet_rows(engine_code, manufacturer):
     try:
         SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
         creds = service_account.Credentials.from_service_account_file('credentials.json', scopes=SCOPES)
@@ -167,7 +167,7 @@ def get_matching_google_sheet_rows(engine_code):
                 hex_color = rgb_to_hex(bg_color)
                 key = headers[j]
                 row_dict[key] = {'value': cell_text, 'bg': hex_color}
-            if any(engine_code.lower() in str(c).lower() for c in row):
+            if engine_code.lower() in codes.lower() and manufacturer.lower() == row_dict.get("Manufacturer", "").lower():
                 rows.append(row_dict)
 
         return rows
