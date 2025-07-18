@@ -158,9 +158,9 @@ def get_matching_google_sheet_rows(engine_code):
         rows = []
 
         try:
-            engine_code_col_index = headers.index("Engine code")
+            engine_code_col_index = headers.index("Engine Code")
         except ValueError:
-            print("Engine code column not found")
+            print("Engine Code column not found")
             return []
 
         for i, row in enumerate(values[1:], start=1):
