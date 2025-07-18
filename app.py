@@ -167,8 +167,31 @@ def get_matching_google_sheet_rows(engine_code):
                 hex_color = rgb_to_hex(bg_color)
                 key = headers[j]
                 row_dict[key] = {'value': cell_text, 'bg': hex_color}
-            if any(engine_code.lower() in str(c).lower() for c in row):
-                rows.append(row_dict)
+
+        try:
+            engine_code_col_index = headers.index("Engine code")
+        except ValueError:
+            print("Engine code column not found")
+            return []
+
+        for i, row in enumerate(values[1:], start=1):
+            row_dict = {}
+            for j, cell in enumerate(row):
+              if j in (18, 19):  # Skip columns R and S
+                continue
+              cell_text = cell
+              bg_color = row_data[i]['values'][j].get('effectiveFormat', {}).get('backgroundColor', {})
+              hex_color = rgb_to_hex(bg_color)
+              key = headers[j]
+              row_dict[key] = {'value': cell_text, 'bg': hex_color}
+    
+          # Now check only the Engine code column cell
+          engine_code_cell = row[engine_code_col_index] if len(row) > engine_code_col_index else ""
+          if engine_code.lower() in engine_code_cell.lower():
+            rows.append(row_dict)
+
+             
+            
 
         return rows
 
