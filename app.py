@@ -159,6 +159,7 @@ def get_matching_google_sheet_rows(engine_code, manufacturer):
 
         for i, row in enumerate(values[1:], start=1):
             row_dict = {}
+            # Build flat dictionary with cell values + background
             for j, cell in enumerate(row):
                 if j in (18, 19):  # Skip columns R and S
                     continue
@@ -167,8 +168,16 @@ def get_matching_google_sheet_rows(engine_code, manufacturer):
                 hex_color = rgb_to_hex(bg_color)
                 key = headers[j]
                 row_dict[key] = {'value': cell_text, 'bg': hex_color}
-            if engine_code.lower() in codes.lower() and manufacturer.lower() == row_dict.get("Manufacturer", "").lower():
-                rows.append(row_dict)
+              
+            # Extract values needed for filtering
+            codes_raw = row_dict.get("Engine Code(s)", {}).get("value", "")
+            sheet_manufacturer = row_dict.get("Manufacturer", {}).get("value", "")
+
+            # Normalize and split engine codes
+            code_list = [code.strip().lower() for code in codes_raw.split(",")]
+          
+            if engine_code.lower() in code_list and manufacturer.lower() == sheet_manufacturer.lower():
+                rows.append(row_dict))
 
         return rows
 
