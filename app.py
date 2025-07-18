@@ -179,7 +179,7 @@ def get_matching_google_sheet_rows(engine_code):
                     key = headers[j]
                     row_dict[key] = {'value': cell_text, 'bg': hex_color}
 
-                rows.append(row_dict))         
+                rows.append(row_dict)         
 
         return rows
 
