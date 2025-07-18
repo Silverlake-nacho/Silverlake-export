@@ -132,7 +132,7 @@ def log_user_lookup(username, reg, vehicle_data):
     conn.commit()
     conn.close()
 
-def get_matching_google_sheet_rows(engine_code, manufacturer):
+def get_matching_google_sheet_rows(engine_code):
     try:
         SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
         creds = service_account.Credentials.from_service_account_file('credentials.json', scopes=SCOPES)
@@ -159,7 +159,6 @@ def get_matching_google_sheet_rows(engine_code, manufacturer):
 
         for i, row in enumerate(values[1:], start=1):
             row_dict = {}
-            # Build flat dictionary with cell values + background
             for j, cell in enumerate(row):
                 if j in (18, 19):  # Skip columns R and S
                     continue
@@ -168,15 +167,7 @@ def get_matching_google_sheet_rows(engine_code, manufacturer):
                 hex_color = rgb_to_hex(bg_color)
                 key = headers[j]
                 row_dict[key] = {'value': cell_text, 'bg': hex_color}
-              
-            # Extract values needed for filtering
-            codes_raw = row_dict.get("Engine Code(s)", {}).get("value", "")
-            sheet_manufacturer = row_dict.get("Manufacturer", {}).get("value", "")
-
-            # Normalize and split engine codes
-            code_list = [code.strip().lower() for code in codes_raw.split(",")]
-          
-            if engine_code.lower() in code_list and manufacturer.lower() == sheet_manufacturer.lower():
+            if any(engine_code.lower() in str(c).lower() for c in row):
                 rows.append(row_dict)
 
         return rows
@@ -260,7 +251,6 @@ def index():
         model = request.form['model']
         year = int(request.form['year'])
         engine_code = request.form.get('engine_code', '').strip()
-        make = request.form.get('make', '').strip()
         min_price = request.form.get('min_price')
         min_opportunity = request.form.get('min_opportunity')
 
@@ -300,11 +290,11 @@ def index():
 
         # First try with first code
         if first_code:
-            google_sheet_matches = get_matching_google_sheet_rows(first_code, make)
+            google_sheet_matches = get_matching_google_sheet_rows(first_code)
 
         # If no matches found, try second code
         if not google_sheet_matches and second_code:
-            google_sheet_matches = get_matching_google_sheet_rows(second_code, make)
+            google_sheet_matches = get_matching_google_sheet_rows(second_code)
 
     return render_template('index.html', parts=parts, search_details=search_details,
                            google_sheet_matches=google_sheet_matches, vehicle_info=vehicle_info, username=session.get('username'))
