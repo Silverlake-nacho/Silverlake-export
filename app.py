@@ -251,6 +251,7 @@ def index():
         model = request.form['model']
         year = int(request.form['year'])
         engine_code = request.form.get('engine_code', '').strip()
+        make = request.form.get('make', '').strip()
         min_price = request.form.get('min_price')
         min_opportunity = request.form.get('min_opportunity')
 
@@ -290,11 +291,11 @@ def index():
 
         # First try with first code
         if first_code:
-            google_sheet_matches = get_matching_google_sheet_rows(first_code)
+            google_sheet_matches = get_matching_google_sheet_rows(first_code, make)
 
         # If no matches found, try second code
         if not google_sheet_matches and second_code:
-            google_sheet_matches = get_matching_google_sheet_rows(second_code)
+            google_sheet_matches = get_matching_google_sheet_rows(second_code, make)
 
     return render_template('index.html', parts=parts, search_details=search_details,
                            google_sheet_matches=google_sheet_matches, vehicle_info=vehicle_info, username=session.get('username'))
