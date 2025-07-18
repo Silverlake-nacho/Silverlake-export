@@ -174,11 +174,6 @@
     </div>
 
       <div class="mb-3">
-        <label class="form-label">Manufacturer</label>
-        <input type="text" name="make" class="form-control" id="make">
-      </div>
-	    
-      <div class="mb-3">
         <label class="form-label">Model</label>
         <input type="text" name="model" class="form-control" required>
         <ul id="model-suggestions" class="list-group" style="display: none; position: absolute; z-index: 1000; max-height: 150px; overflow-y: auto;"></ul>
@@ -560,7 +555,6 @@ async function fetchVehicleData(source) {
             document.querySelector('[name="model"]').value = data.model || '';
             document.querySelector('[name="year"]').value = data.year || '';
             document.querySelector('[name="engine_code"]').value = data.engine_code || '';
-	    document.querySelector('[name="make"]').value = data.make || '';
 
 	    // Also populate hidden fields so info persists on Search
 	    document.getElementById('vehicle_info_manufacturer').value = data.manufacturer || '';
