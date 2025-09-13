@@ -302,7 +302,7 @@
   </thead>
   <tbody id="cart-body"></tbody>
 </table>
-<button class="btn btn-primary" onclick="sendCart()">Send Request</button>
+<button id="send-request-btn" class="btn btn-primary" onclick="sendCart()">Send Request</button>
 <button class="btn btn-danger" onclick="clearCart()">Clear Cart</button>
 
 	    
@@ -409,10 +409,8 @@ function renderCart() {
   
   // Show/hide cart section
   const button = document.getElementById('send-request-btn');
-  if (cart.length > 0) {
-    button.style.display = 'inline-block';
-  } else {
-    button.style.display = 'none';
+  if (button) {
+    button.style.display = cart.length > 0 ? 'inline-block' : 'none';
   }
 }
 
