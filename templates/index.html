@@ -317,7 +317,7 @@ let cart = [];
 
 function addToCart(item) {
   // Attach current registration and placeholder for tag number
-  item['Registration'] = document.getElementById('registration').value.trim().toUpperCase();
+  item['Registration'] = document.getElementById('registration').value;
   item['Tag Number'] = item['Tag Number'] || '';
   cart.push(item);
   alert("Item added to cart!");
