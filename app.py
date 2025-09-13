@@ -11,6 +11,7 @@ import base64
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
 
 import sqlite3
 import os
@@ -58,6 +59,20 @@ c.execute("""
 CREATE TABLE IF NOT EXISTS user_carts (
     username TEXT PRIMARY KEY,
     cart_json TEXT
+)
+""")
+conn.commit()
+conn.close()
+
+# Create table to store order history
+conn = sqlite3.connect(DB_PATH)
+c = conn.cursor()
+c.execute("""
+CREATE TABLE IF NOT EXISTS order_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT,
+    cart_json TEXT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
 )
 """)
 conn.commit()
@@ -433,6 +448,21 @@ def search_history():
 
     return render_template('search_history.html', history=history, username=username)
 
+@app.route('/order_history')
+def order_history():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    username = session.get('username', 'unknown')
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT id, cart_json, timestamp FROM order_history WHERE username = ? ORDER BY timestamp DESC", (username,))
+    rows = c.fetchall()
+    conn.close()
+    orders = []
+    for order_id, cart_json, ts in rows:
+        orders.append({'id': order_id, 'timestamp': ts, 'items': json.loads(cart_json)})
+    return render_template('order_history.html', orders=orders, username=username)
+
 @app.route('/send_cart_email', methods=['POST'])
 def send_cart_email():
     if not session.get('logged_in'):
@@ -446,11 +476,14 @@ def send_cart_email():
 
     username = session.get('username', 'unknown')
     subject = f"Parts Request from {username}"
-    body = "Parts requested:\n\n"
+    body = "Attached is the list of requested parts."
 
-    for part in cart:
-        line = ", ".join(f"{key}: {val}" for key, val in part.items())
-        body += line + "\n"
+    # Create Excel attachment from cart
+    df_cart = pd.DataFrame(cart)
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df_cart.to_excel(writer, index=False, sheet_name='Parts')
+    output.seek(0)
 
     # Email configuration (adjust as needed)
     sender_email = "nacho@silverlake.co.uk"
@@ -465,12 +498,23 @@ def send_cart_email():
     msg['To'] = recipient_email
     msg['Subject'] = subject
     msg.attach(MIMEText(body, 'plain'))
-
+    attachment = MIMEApplication(output.read(), _subtype='xlsx')
+    attachment.add_header('Content-Disposition', 'attachment', filename='cart.xlsx')
+    msg.attach(attachment)
+  
     try:
         with smtplib.SMTP(smtp_server, smtp_port) as server:
             server.starttls()
             server.login(smtp_user, smtp_password)
             server.send_message(msg)
+          
+        # Save order to history
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("INSERT INTO order_history (username, cart_json) VALUES (?, ?)", (username, json.dumps(cart)))
+        conn.commit()
+        conn.close()
+      
         return jsonify({'message': 'Request sent successfully!'})
     except Exception as e:
         print("Email error:", e)
