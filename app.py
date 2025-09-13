@@ -497,12 +497,12 @@ def send_cart_email():
     conn.close()
   
     # Email configuration (adjust as needed)
-    sender_email = "nacho@silverlake.co.uk"
+    sender_email = "silverlake.export@gmail.com"
     recipient_email = "nacho@silverlake.co.uk"
-    smtp_server = "smtp.office365.com"
+    smtp_server = "smtp.gmail.com"
     smtp_port = 587
-    smtp_user = "nacho@silverlake.co.uk"
-    smtp_password = "!Cab34783"
+    smtp_user = sender_email
+    smtp_password = "@Silverlake1!"
 
     msg = MIMEMultipart()
     msg['From'] = sender_email
