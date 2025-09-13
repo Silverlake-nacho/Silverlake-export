@@ -294,7 +294,7 @@ def index():
         first_code, second_code = '', ''
 
         if engine_code:
-             if '(' in engine_code and ')' in engine_code:
+            if '(' in engine_code and ')' in engine_code:
                 first_code = engine_code.split('(')[0].strip()
                 second_code = engine_code.split('(')[1].split(')')[0].strip()
             else:
