@@ -443,6 +443,10 @@ function sendCart() {
   })
   .then(response => response.json())
   .then(data => {
+    if (data.error) {
+      alert(data.error);
+      return; // keep cart so user doesn't lose it
+    }
     alert(data.message || "Cart sent!");
     cart = [];
     renderCart();
