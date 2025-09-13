@@ -284,11 +284,12 @@
 
 	  
 <h2>Selected Parts</h2>
-	    
+
 <table class="table table-bordered table-striped mt-3" id="cart-table">
   <thead>
     <tr>
       <th style="width: 40px;">Item No.</th>
+      <th>Registration</th>
       <th>Make</th>
       <th>Model</th>
       <th>Engine Code</th>
@@ -296,6 +297,7 @@
       <th>Man/Auto</th>
       <th>Eng Size</th>
       <th>Price</th>
+      <th>Tag Number</th>
       <th>Remove</th>
     </tr>
   </thead>
@@ -314,6 +316,9 @@ let cart = [];
 
 
 function addToCart(item) {
+  // Attach current registration and placeholder for tag number
+  item['Registration'] = document.getElementById('registration').value.trim().toUpperCase();
+  item['Tag Number'] = item['Tag Number'] || '';
   cart.push(item);
   alert("Item added to cart!");
   renderCart();
@@ -325,7 +330,7 @@ function renderCart() {
   const tableBody = document.getElementById('cart-body');
   tableBody.innerHTML = '';
 
-  const fieldsToShow = ['Make', 'Model', 'Engine Code', 'Fuel', 'Man/Auto', 'Eng Size', 'Price'];
+  const fieldsToShow = ['Registration', 'Make', 'Model', 'Engine Code', 'Fuel', 'Man/Auto', 'Eng Size', 'Price', 'Tag Number'];
 
   let totalPrice = 0;
 
@@ -336,21 +341,33 @@ function renderCart() {
     const rowNumber = document.createElement('td');
     rowNumber.textContent = index + 1;
     row.appendChild(rowNumber);
-	  
+
     fieldsToShow.forEach(key => {
       const cell = document.createElement('td');
-      const val = item[key] || '';
-      cell.textContent = val;
+      if (key === 'Tag Number') {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'form-control form-control-sm';
+        input.value = item[key] || '';
+        input.addEventListener('input', (e) => {
+          item[key] = e.target.value;
+          localStorage.setItem(CART_KEY, JSON.stringify(cart));
+          saveCartToServer();
+        });
+        cell.appendChild(input);
+      } else {
+        const val = item[key] || '';
+        cell.textContent = val;
 
-      // Accumulate price if valid
-      if (key === 'Price') {
-        const numeric = parseFloat(val.toString().replace(/[£,$]/g, ''));
-        if (!isNaN(numeric)) totalPrice += numeric;
+        // Accumulate price if valid
+        if (key === 'Price') {
+          const numeric = parseFloat(val.toString().replace(/[£,$]/g, ''));
+          if (!isNaN(numeric)) totalPrice += numeric;
+        }
       }
-
       row.appendChild(cell);
     });
-	  
+
     // Add remove button
     const removeCell = document.createElement('td');
     removeCell.innerHTML = `<button class="btn btn-sm btn-danger" onclick="removeFromCart(${index})">Remove</button>`;
@@ -364,7 +381,7 @@ function renderCart() {
     const totalRow = document.createElement('tr');
 
     const totalLabelCell = document.createElement('td');
-    totalLabelCell.colSpan = 7;
+    totalLabelCell.colSpan = fieldsToShow.length - 1;
     totalLabelCell.className = 'text-end fw-bold';
     totalLabelCell.textContent = 'Total:';
     totalRow.appendChild(totalLabelCell);
@@ -373,6 +390,9 @@ function renderCart() {
     totalValueCell.className = 'fw-bold';
     totalValueCell.textContent = `£${totalPrice.toFixed(2)}`;
     totalRow.appendChild(totalValueCell);
+
+    // Empty tag number cell
+    totalRow.appendChild(document.createElement('td'));
 
     // Empty remove cell
     totalRow.appendChild(document.createElement('td'));
