@@ -496,13 +496,16 @@ def send_cart_email():
     conn.commit()
     conn.close()
   
-    # Email configuration (adjust as needed)
-    sender_email = "silverlake.export@gmail.com"
+    # Email configuration: use Gmail credentials from environment variables
+    sender_email = os.environ.get("silverlake.export@gmail.com")
+    smtp_password = os.environ.get("jbkbwnpphnoquqtx")
     recipient_email = "nacho@silverlake.co.uk"
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
     smtp_user = sender_email
-    smtp_password = "@Silverlake1!"
+
+    if not sender_email or not smtp_password:
+        return jsonify({'error': 'Email credentials not configured'}), 500
 
     msg = MIMEMultipart()
     msg['From'] = sender_email
