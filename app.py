@@ -485,6 +485,17 @@ def send_cart_email():
         df_cart.to_excel(writer, index=False, sheet_name='Parts')
     output.seek(0)
 
+    # Save order to history before attempting to send the email so the
+    # cart is not lost if email delivery fails
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute(
+        "INSERT INTO order_history (username, cart_json) VALUES (?, ?)",
+        (username, json.dumps(cart)),
+    )
+    conn.commit()
+    conn.close()
+  
     # Email configuration (adjust as needed)
     sender_email = "nacho@silverlake.co.uk"
     recipient_email = "nacho@silverlake.co.uk"
@@ -507,18 +518,12 @@ def send_cart_email():
             server.starttls()
             server.login(smtp_user, smtp_password)
             server.send_message(msg)
-          
-        # Save order to history
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute("INSERT INTO order_history (username, cart_json) VALUES (?, ?)", (username, json.dumps(cart)))
-        conn.commit()
-        conn.close()
       
         return jsonify({'message': 'Request sent successfully!'})
     except Exception as e:
         print("Email error:", e)
-        return jsonify({'error': 'Failed to send email'}), 500
+        # Return an error but keep the cart intact on the client side
+        return jsonify({'error': 'Order saved, but email failed to send.'}), 500
       
 @app.route('/save_cart', methods=['POST'])
 def save_cart():
