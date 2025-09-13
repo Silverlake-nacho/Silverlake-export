@@ -496,9 +496,9 @@ def send_cart_email():
     conn.commit()
     conn.close()
   
-    # Email configuration: use Gmail credentials from environment variables
-    sender_email = os.environ.get("silverlake.export@gmail.com")
-    smtp_password = os.environ.get("jbkbwnpphnoquqtx")
+    # Email configuration: use Gmail credentials from environment variables jbkbwnpphnoquqtx
+    sender_email = os.environ.get("SMTP_USER")
+    smtp_password = os.environ.get("SMTP_PASS") 
     recipient_email = "nacho@silverlake.co.uk"
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
