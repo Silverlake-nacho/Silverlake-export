@@ -416,9 +416,9 @@ function renderCart() {
 
 async function clearCart() {
   cart = [];
-  localStorage.removeItem(CART_KEY);
   renderCart();
   await saveCartToServer(); // clear server too
+  localStorage.removeItem(CART_KEY);
 }
 
 function removeFromCart(index) {
@@ -428,32 +428,34 @@ function removeFromCart(index) {
   saveCartToServer();
 }
 
-function sendCart() {
+async function sendCart() {
   if (cart.length === 0) {
     alert("Cart is empty!");
     return;
   }
 
-  fetch('/send_cart_email', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ cart })
-  })
-  .then(response => response.json())
-  .then(data => {
+   try {
+    const response = await fetch('/send_cart_email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cart })
+    });
+    const data = await response.json();
+
     if (data.error) {
       alert(data.error);
       return; // keep cart so user doesn't lose it
     }
+	   
     alert(data.message || "Cart sent!");
     cart = [];
     renderCart();
     localStorage.removeItem(CART_KEY);
-  })
-  .catch(err => {
+    await saveCartToServer(); // clear server copy
+  } catch (err) {
     console.error("Error sending cart:", err);
     alert("Failed to send cart.");
-  });
+  }
 }
 
 window.onload = async function () {
