@@ -14,6 +14,7 @@ from email.mime.multipart import MIMEMultipart
 
 import sqlite3
 import os
+import json
 DB_PATH = os.path.join('/var/data', 'carweb_cache.db')
 
 # Initialize cache table
@@ -290,22 +291,20 @@ def index():
 
         # Google Sheet search: fallback logic
         google_sheet_matches = []
+        first_code, second_code = '', ''
 
         if engine_code:
-            first_code, second_code = '', ''
-        if '(' in engine_code and ')' in engine_code:
-            first_code = engine_code.split('(')[0].strip()
-            second_code = engine_code.split('(')[1].split(')')[0].strip()
-        else:
-            first_code = engine_code
+             if '(' in engine_code and ')' in engine_code:
+                first_code = engine_code.split('(')[0].strip()
+                second_code = engine_code.split('(')[1].split(')')[0].strip()
+            else:
+                first_code = engine_code
 
-        # First try with first code
-        if first_code:
-            google_sheet_matches = get_matching_google_sheet_rows(first_code)
+            if first_code:
+                google_sheet_matches = get_matching_google_sheet_rows(first_code)
 
-        # If no matches found, try second code
-        if not google_sheet_matches and second_code:
-            google_sheet_matches = get_matching_google_sheet_rows(second_code)
+            if not google_sheet_matches and second_code:
+                google_sheet_matches = get_matching_google_sheet_rows(second_code)
 
     return render_template('index.html', parts=parts, search_details=search_details,
                            google_sheet_matches=google_sheet_matches, vehicle_info=vehicle_info, username=session.get('username'))
